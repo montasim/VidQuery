@@ -1,0 +1,85 @@
+{
+  "name": "npm-boilerplate",
+  "version": "0.0.4",
+  "description": "A simple npm boilerplate.",
+  "engines": {
+    "node": ">=20.x",
+    "pnpm": ">=10.x"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/index.mjs",
+    "require": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rimraf dist && tsup src/index.ts --dts --format esm,cjs --out-dir dist",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "eslint:check": "eslint .",
+    "eslint:fix": "eslint . --fix",
+    "prettier:check": "prettier . --check",
+    "prettier:fix": "prettier . --write",
+    "lint:check": "eslint . && prettier . --check",
+    "lint:fix": "eslint . --fix && prettier . --write",
+    "prepare": "husky",
+    "commitlint": "commitlint --edit",
+    "release": "HUSKY_SKIP_HOOKS=1 standard-version && git push --follow-tags",
+    "release:minor": "standard-version --release-as minor && git push --follow-tags",
+    "release:major": "standard-version --release-as major && git push --follow-tags",
+    "release:patch": "standard-version --release-as patch && git push --follow-tags"
+  },
+  "keywords": [
+    "npm",
+    "boilerplate",
+    "typescript",
+    "javascript",
+    "montasim"
+  ],
+  "author": {
+    "name": "Mohammad Montasim -Al- Mamun Shuvo",
+    "portfolio": "https://montasim-dev.web.app/",
+    "contact": {
+      "email": "montasimmamun@gmail.com",
+      "mobile": "+8801722815469"
+    },
+    "social": {
+      "linkedIn": "https://www.linkedin.com/in/montasim",
+      "gitHub": "https://github.com/montasim"
+    }
+  },
+  "license": "CC BY-NC-ND 4.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/montasim/client-parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/montasim/client-parser/issues"
+  },
+  "homepage": "https://github.com/montasim/client-parser",
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.8.1",
+    "@types/jest": "^30.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "commitlint": "^19.8.1",
+    "eslint": "^9.31.0",
+    "husky": "^9.1.7",
+    "jest": "^30.0.5",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "standard-version": "^9.5.0",
+    "ts-jest": "^29.4.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}
