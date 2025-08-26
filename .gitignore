@@ -54,6 +54,7 @@
 # General output folder for build artifacts.
 /build
 /dist
+/extension-dist
 /out
 
 # Next.js build directory.

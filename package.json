@@ -1,25 +1,30 @@
 {
-  "name": "npm-boilerplate",
-  "version": "0.0.5",
-  "description": "A simple npm boilerplate.",
+  "name": "youtube-video-chat-extension",
+  "version": "1.0.0",
+  "description": "A Chromium browser extension that enables AI-powered conversations about YouTube videos using Google's Gemini API.",
   "engines": {
     "node": ">=20.x",
     "pnpm": ">=10.x"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
+  "main": "./extension-dist/manifest.json",
+  "module": "./extension-dist/content.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    "extension": "./extension-dist/",
+    "package": "./youtube-video-chat-extension.zip"
   },
   "files": [
-    "dist",
-    "CHANGELOG.md",
-    "README.md"
+    "extension-dist",
+    "youtube-video-chat-extension.zip",
+    "README.md",
+    "DEPLOYMENT.md"
   ],
   "scripts": {
     "build": "rimraf dist && tsup src/index.ts --dts --format esm,cjs --out-dir dist",
+    "build:extension": "rimraf extension-dist && node scripts/build-extension.js",
+    "package:extension": "npm run build:extension && cd extension-dist && zip -r ../youtube-video-chat-extension.zip .",
+    "dev:extension": "npm run build:extension && echo 'Extension built! Load extension-dist/ folder in Chrome'",
+    "install:chrome": "npm run build:extension && echo 'Go to chrome://extensions/ and load the extension-dist/ folder'",
     "test": "jest",
     "test:watch": "jest --watch",
     "eslint:check": "eslint .",
@@ -36,11 +41,16 @@
     "release:patch": "standard-version --release-as patch && git push --follow-tags"
   },
   "keywords": [
-    "npm",
-    "boilerplate",
-    "typescript",
-    "javascript",
-    "montasim"
+    "chrome-extension",
+    "youtube",
+    "ai-chat",
+    "gemini-api",
+    "video-analysis",
+    "browser-extension",
+    "chromium",
+    "artificial-intelligence",
+    "video-chat",
+    "content-analysis"
   ],
   "author": {
     "name": "Mohammad Montasim -Al- Mamun Shuvo",
@@ -57,12 +67,12 @@
   "license": "CC BY-NC-ND 4.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/montasim/client-parser.git"
+    "url": "git+https://github.com/montasim/youtube-helper.git"
   },
   "bugs": {
-    "url": "https://github.com/montasim/client-parser/issues"
+    "url": "https://github.com/montasim/youtube-helper/issues"
   },
-  "homepage": "https://github.com/montasim/client-parser",
+  "homepage": "https://github.com/montasim/youtube-helper",
   "publishConfig": {
     "access": "public"
   },
@@ -73,6 +83,7 @@
     "@typescript-eslint/parser": "^8.38.0",
     "commitlint": "^19.8.1",
     "eslint": "^9.31.0",
+    "globals": "^16.3.0",
     "husky": "^9.1.7",
     "jest": "^30.0.5",
     "prettier": "^3.6.2",

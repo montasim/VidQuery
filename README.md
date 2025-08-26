@@ -1,82 +1,167 @@
-# npm-package-name
+# YouTube Video Chat Assistant
 
-<!-- repository summary badges start -->
-<div>
-    <img alt="NPM Version" src="https://badgen.net/npm/v/npm-package-name?label=version&labelColor=EB008B&color=00B8B5">
-    <img alt="NPM Downloads" src="https://badgen.net/npm/dm/npm-package-name?label=downloads&labelColor=EB008B&color=00B8B5">
-    <img alt="NPM Package" src="https://badgen.net/npm/license/npm-package-name?label=license&labelColor=EB008B&color=00B8B5">
-</div>
-<!-- repository summary badges end -->
+A Chromium browser extension that enables AI-powered conversations about YouTube videos using Google's Gemini API. The extension extracts full video context (title, description, transcript) and allows you to ask questions about any YouTube video you're watching.
 
-The [npm-package-name](https://www.npmjs.com/package/npm-package-name) summary.
+## Features
 
-## Table of Contents
+- 🎥 **Video Context Extraction**: Automatically extracts video title, description, channel info, and transcript
+- 🤖 **AI-Powered Chat**: Uses Google Gemini AI for intelligent responses about video content
+- 📺 **Video History**: Track and quickly navigate between recent videos you've chatted about
+- 💬 **Seamless Integration**: Chat interface appears directly on YouTube video pages
+- 🔒 **Privacy-First**: Your API key is stored locally in the browser
+- 📱 **Responsive Design**: Works on desktop and mobile layouts
+- ⚡ **Real-time**: Get instant responses while watching videos
 
-- [Key Features](#key-features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [License](#license)
-- [Acknowledgments](#acknowledgments)
-- [FAQs](#faqs)
+## Setup Instructions
 
----
+### 1. Get a Gemini API Key
 
-## Key Features
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with your Google account
+3. Create a new API key
+4. Copy the API key (keep it secure!)
 
-1. **Feature 1:** Details of feature 1
-2. **Feature 1:** Details of feature 2
-3. **Feature 1:** Details of feature 3
-4. **Feature 1:** Details of feature 4
+### 2. Install the Extension
 
----
+#### Option A: Load as Developer Extension (Recommended for Development)
 
-## Installation
+1. Open Chrome/Chromium browser
+2. Go to `chrome://extensions/`
+3. Enable "Developer mode" (toggle in top-right corner)
+4. Click "Load unpacked"
+5. Select the `youtube-helper` folder
+6. The extension should now appear in your extensions list
 
-To install the package, run the following command:
+### 3. Configure the Extension
 
-```bash
-npm install npm-package-name
+1. Click the extension icon in your browser toolbar
+2. Enter your Gemini API key in the popup
+3. Click "Save Configuration"
+4. Wait for the success message confirming the API key is valid
+
+### 4. Start Chatting!
+
+1. Go to any YouTube video (e.g., `https://www.youtube.com/watch?v=...`)
+2. Look for the red "Chat about this video" button on the bottom right corner
+3. Click the button to expand the chat interface
+4. **Type your questions** and press Enter or click Send
+5. **View video history** by clicking the 📺 button in the chat header
+6. Start conversing about the video content!
+
+## Example Questions You Can Ask
+
+- "What is the main topic of this video?"
+- "Can you summarize the key points?"
+- "What does the speaker say about [specific topic]?"
+- "At what time does the speaker mention [something specific]?"
+- "What are the main arguments presented?"
+- "Can you explain [concept] that was mentioned in the video?"
+
+## Video History & Interface Features
+
+### 📺 Video History
+
+- **Automatic Tracking**: Extension automatically tracks videos you chat about
+- **Quick Access**: Click the 📺 button in chat header to view recent videos
+- **Current Video Info**: See current video details at the top of chat
+- **Easy Navigation**: Click → button to quickly jump to any previous video
+- **Smart Storage**: Keeps last 10 videos, stored locally in your browser
+
+### Usage Tips
+
+- **Video Context**: Each video maintains separate chat context - switching videos updates the AI's knowledge
+- **History Persistence**: Video history is saved locally and persists across browser sessions
+- **Performance**: History is limited to 10 videos to maintain optimal performance
+
+### 🖱️ Fixed Position Interface
+
+- **Fixed Location**: Chat button stays in the bottom right corner for consistency
+- **Responsive Design**: Automatically adjusts position on smaller screens
+- **Clean Interface**: Simple, non-intrusive design that doesn't interfere with video watching
+
+## Technical Details
+
+### Architecture
+
+- **Content Script** (`content.js`): Injected into YouTube pages, handles UI and video context extraction
+- **Background Script** (`background.js`): Handles Gemini API communication
+- **Popup** (`popup.html/js`): Extension configuration interface
+- **Styles** (`styles.css`): Chat interface styling
+
+### Video Context Extraction
+
+The extension automatically extracts:
+
+- Video title and description
+- Channel information
+- Video duration and current playback time
+- Transcript (when available)
+- Video URL and metadata
+
+### Privacy & Security
+
+- API keys are stored locally using Chrome's storage.sync API
+- No data is sent to third-party servers except Google's Gemini API
+- All communication is encrypted (HTTPS)
+- The extension only works on YouTube domains
+
+## Development
+
+### File Structure
+
+```
+youtube-helper/
+├── manifest.json         # Extension manifest
+├── content.js           # Main content script
+├── background.js        # Service worker for API calls
+├── styles.css          # Chat interface styles
+├── popup.html          # Extension popup interface
+├── popup.js            # Popup functionality
+├── icons/              # Extension icons (add your own)
+└── README.md           # This file
 ```
 
-or
+### API Usage
 
-```bash
-yarn add npm-package-name
-```
+The extension uses the Gemini 2.5 Flash model via REST API:
 
-or
+- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
+- Model: `gemini-2.5-flash` (latest free model with best price-performance)
+- Temperature: 0.7 (configurable)
+- Max tokens: 1024 (configurable)
 
-```bash
-pnpm add npm-package-name
-```
+## Troubleshooting
 
-or
+### Chat Button Not Appearing
 
-```bash
-bun add npm-package-name
-```
+- Make sure you're on a YouTube video page (not the homepage)
+- Try refreshing the page
+- Check that the extension is enabled in `chrome://extensions/`
 
----
+### API Key Issues
 
-## Usage
+- Verify your API key is correct and active
+- Check that you have available quota in Google AI Studio
+- Make sure the API key has the necessary permissions
 
-### JavaScript CommonJS Example
+### No Responses from AI
 
-```javascript
+- Check the browser console for error messages
+- Verify your internet connection
+- Try regenerating your API key
 
-```
+### Extension Not Loading
 
-### JavaScript ESM Example
+- Make sure you've loaded the unpacked extension correctly
+- Check for any errors in the Extensions page
+- Try reloading the extension
 
-```javascript
+### Video History Issues
 
-```
-
-### TypeScript ESM Example
-
-```typescript
-
-```
+- **History Not Showing**: Check if you've visited multiple videos - history appears after 2+ videos
+- **Missing Videos**: Only videos you've opened the chat interface on are tracked
+- **History Cleared**: History is stored locally - clearing browser data will reset it
+- **Navigation Issues**: Ensure popup blockers aren't preventing video navigation
 
 ---
 
