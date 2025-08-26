@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.1.0 (2025-08-26)
+
+
+### Features
+
+* basic extension setup ([5fdcd97](https://github.com/montasim/youtube-helper/commit/5fdcd978073970d655a62cf8093ec09b8425d0e1))
+
 ### 0.0.5 (2025-08-26)
 
 ### 0.0.4 (2025-07-25)
