@@ -17,6 +17,7 @@ import {
     Pencil,
     RefreshCw,
     RotateCcw,
+    X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -196,6 +197,12 @@ export function SidePanelApp() {
         }
     };
 
+    const closePanel = async () => {
+        await chrome.sidePanel.close({
+            windowId: chrome.windows.WINDOW_ID_CURRENT,
+        });
+    };
+
     return (
         <main className="flex min-h-screen flex-col bg-paper text-graphite">
             <header className="sticky top-0 z-20 border-b border-line bg-paper/95 px-4 pb-3 pt-4 backdrop-blur-xl">
@@ -244,6 +251,15 @@ export function SidePanelApp() {
                         ) : (
                             <History className="h-4 w-4" />
                         )}
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ml-1"
+                        onClick={() => void closePanel()}
+                        aria-label="Close assistant"
+                    >
+                        <X className="h-4 w-4" />
                     </Button>
                 </div>
             </header>

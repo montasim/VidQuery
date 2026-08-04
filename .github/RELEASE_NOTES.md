@@ -18,7 +18,7 @@
     ```
 
 3. Extract the ZIP to a permanent folder.
-4. Open `chrome://extensions` in Chrome 116 or later.
+4. Open `chrome://extensions` in Chrome 141 or later.
 5. Enable **Developer mode**.
 6. Select **Load unpacked** and choose the extracted folder containing `manifest.json`.
 7. Open the YouTube Helper popup, connect a Gemini API key, then open a supported YouTube video and launch the Side Panel.

@@ -48,7 +48,7 @@ GitHub-installed builds do not update automatically. Repeat this process for eac
 
 - Node.js 20.19.3 or newer
 - pnpm 10.10.0 or compatible
-- Chrome or a Chromium browser with Manifest V3 Side Panel support
+- Chrome 141 or newer, required for the in-panel close control
 - A Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### Build and load

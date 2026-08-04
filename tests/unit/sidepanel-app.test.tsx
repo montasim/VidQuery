@@ -1,10 +1,13 @@
-import { render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SidePanelApp } from '../../src/ui/sidepanel/sidepanel-app';
 
 const listeners = { addListener: vi.fn(), removeListener: vi.fn() };
 
 describe('Side Panel entry states', () => {
+    afterEach(cleanup);
+
     beforeEach(() => {
         vi.stubGlobal('chrome', {
             runtime: {
@@ -34,6 +37,8 @@ describe('Side Panel entry states', () => {
                 update: vi.fn(),
             },
             action: { openPopup: vi.fn() },
+            sidePanel: { close: vi.fn().mockResolvedValue(undefined) },
+            windows: { WINDOW_ID_CURRENT: -2 },
         });
     });
 
@@ -46,5 +51,16 @@ describe('Side Panel entry states', () => {
         expect(
             screen.queryByPlaceholderText('Ask about this video…')
         ).not.toBeInTheDocument();
+    });
+
+    it('closes the current window side panel from the header', async () => {
+        const user = userEvent.setup();
+        render(<SidePanelApp />);
+
+        await user.click(
+            screen.getByRole('button', { name: 'Close assistant' })
+        );
+
+        expect(chrome.sidePanel.close).toHaveBeenCalledWith({ windowId: -2 });
     });
 });

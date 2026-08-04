@@ -12,7 +12,7 @@ export default defineConfig({
         short_name: 'YouTube Helper',
         description:
             'Ask Gemini questions grounded in the YouTube video you are watching.',
-        minimum_chrome_version: '116',
+        minimum_chrome_version: '141',
         permissions: ['activeTab', 'sidePanel', 'storage', 'tabs'],
         host_permissions: [
             ...youtubeOrigins,
