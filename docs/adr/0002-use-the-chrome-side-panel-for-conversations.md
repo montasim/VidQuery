@@ -19,7 +19,7 @@ Move the primary video-question workspace from a floating element injected over 
 - The popup’s primary post-setup action opens the Side Panel.
 - A Shadow DOM launcher is mounted only on supported watch, Shorts, and live routes. It survives YouTube single-page navigation and opens the Side Panel through a typed background-worker request triggered by the person’s click.
 - The Side Panel owns the current Video Context, Conversation, loading and error feedback, message edit/retry actions, and Recent Videos.
-- The Side Panel header includes an explicit close control backed by `chrome.sidePanel.close()`. Chrome 141 becomes the minimum supported version because earlier releases do not expose that API to extension pages.
+- The Side Panel header includes an explicit close control backed by `chrome.sidePanel.close()`. It closes the active tab-specific panel used by the YouTube launcher first, then falls back to the global window panel used by the popup. Chrome 141 becomes the minimum supported version because earlier releases do not expose that API to extension pages.
 - On a supported YouTube watch, Shorts, or live page, a content script collects bounded Video Context locally and reports it to the extension. No general page dump is collected.
 - Video Context is refreshed when the panel opens or the active YouTube video changes. Nothing is sent to Gemini until the person submits a question.
 - On unsupported pages or when no usable video is present, the Side Panel shows a clear empty state rather than attempting a Gemini request.

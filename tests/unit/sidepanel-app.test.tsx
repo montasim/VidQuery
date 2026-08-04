@@ -35,10 +35,11 @@ describe('Side Panel entry states', () => {
                 onUpdated: listeners,
                 create: vi.fn(),
                 update: vi.fn(),
+                query: vi.fn().mockResolvedValue([{ id: 42 }]),
             },
             action: { openPopup: vi.fn() },
             sidePanel: { close: vi.fn().mockResolvedValue(undefined) },
-            windows: { WINDOW_ID_CURRENT: -2 },
+            windows: { getCurrent: vi.fn().mockResolvedValue({ id: 7 }) },
         });
     });
 
@@ -53,7 +54,7 @@ describe('Side Panel entry states', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('closes the current window side panel from the header', async () => {
+    it('closes the active tab-specific side panel from the header', async () => {
         const user = userEvent.setup();
         render(<SidePanelApp />);
 
@@ -61,7 +62,25 @@ describe('Side Panel entry states', () => {
             screen.getByRole('button', { name: 'Close assistant' })
         );
 
-        expect(chrome.sidePanel.close).toHaveBeenCalledWith({ windowId: -2 });
+        expect(chrome.sidePanel.close).toHaveBeenCalledWith({ tabId: 42 });
+    });
+
+    it('falls back to the global window panel when the tab panel is absent', async () => {
+        const user = userEvent.setup();
+        vi.mocked(chrome.sidePanel.close).mockRejectedValueOnce(
+            new Error('No tab-specific side panel is open.')
+        );
+        render(<SidePanelApp />);
+
+        await user.click(
+            screen.getByRole('button', { name: 'Close assistant' })
+        );
+
+        await vi.waitFor(() =>
+            expect(chrome.sidePanel.close).toHaveBeenLastCalledWith({
+                windowId: 7,
+            })
+        );
     });
 
     it('offers the external SupportKori action without embedding it', () => {

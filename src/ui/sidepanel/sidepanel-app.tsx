@@ -199,9 +199,22 @@ export function SidePanelApp() {
     };
 
     const closePanel = async () => {
-        await chrome.sidePanel.close({
-            windowId: chrome.windows.WINDOW_ID_CURRENT,
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            lastFocusedWindow: true,
         });
+        if (typeof tab?.id === 'number') {
+            try {
+                await chrome.sidePanel.close({ tabId: tab.id });
+                return;
+            } catch {
+                // A panel opened from the popup is global, not tab-specific.
+            }
+        }
+        const currentWindow = await chrome.windows.getCurrent();
+        if (typeof currentWindow.id === 'number') {
+            await chrome.sidePanel.close({ windowId: currentWindow.id });
+        }
     };
 
     return (
