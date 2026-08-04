@@ -1,249 +1,138 @@
 # YouTube Video Chat Assistant
 
-A Chromium browser extension that enables AI-powered conversations about YouTube videos using Google's Gemini API. The extension extracts full video context (title, description, transcript) and allows you to ask questions about any YouTube video you're watching.
+> A Chromium extension that brings Gemini-powered questions and answers into YouTube watch, Shorts, and live-video pages.
+
+[![Support on SupportKori](https://img.shields.io/badge/Support_on-SupportKori-00B8B5)](https://www.supportkori.com/montasim)
+[![Build, Test, and Publish](https://github.com/montasim/youtube-helper/actions/workflows/publish.yml/badge.svg)](https://github.com/montasim/youtube-helper/actions/workflows/publish.yml)
+
+The extension gathers the current video’s visible metadata and transcript when available, injects a chat panel into YouTube, and sends the resulting context plus each question directly to Google’s Gemini 2.5 Flash API using the user’s own key.
+
+**[Report an issue](https://github.com/montasim/youtube-helper/issues) · [Get a Gemini API key](https://aistudio.google.com/app/apikey)**
 
 ## Features
 
-- 🎥 **Video Context Extraction**: Automatically extracts video title, description, channel info, and transcript
-- 🤖 **AI-Powered Chat**: Uses Google Gemini AI for intelligent responses about video content
-- 📺 **Video History**: Track and quickly navigate between recent videos you've chatted about
-- 💬 **Seamless Integration**: Chat interface appears directly on YouTube video pages
-- 🔒 **Privacy-First**: Your API key is stored locally in the browser
-- 📱 **Responsive Design**: Works on desktop and mobile layouts
-- ⚡ **Real-time**: Get instant responses while watching videos
+- Embedded chat on YouTube watch, Shorts, and live pages
+- Video title, channel, description, duration, playback time, URL, and transcript context
+- Gemini 2.5 Flash responses with the user’s own API key
+- API-key validation from the extension popup
+- Recent-video history for up to ten videos
+- Single-page navigation detection when the current YouTube video changes
+- Manifest V3 extension build and ZIP packaging commands
 
-## Setup Instructions
+## Privacy at a glance
 
-### 1. Get a Gemini API Key
+The Gemini key is stored with `chrome.storage.sync`, which can synchronize through the signed-in browser profile. Recent video history is stored in YouTube-origin `localStorage`. When you chat, video metadata, any extracted transcript, the video URL, current playback time, and your question are sent to Google’s Generative Language API. Review Google’s data terms before using confidential or private material.
 
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Create a new API key
-4. Copy the API key (keep it secure!)
+This project does not operate an intermediary backend.
 
-### 2. Install the Extension
+## Install from source
 
-#### Option A: Load as Developer Extension (Recommended for Development)
+### Requirements
 
-1. Open Chrome/Chromium browser
-2. Go to `chrome://extensions/`
-3. Enable "Developer mode" (toggle in top-right corner)
-4. Click "Load unpacked"
-5. Select the `youtube-helper` folder
-6. The extension should now appear in your extensions list
+- Node.js 20.19.3 (see `.node-version`)
+- npm (the repository commits `package-lock.json`)
+- Chrome or another Chromium browser
+- A Gemini API key with Generative Language API access
 
-### 3. Configure the Extension
+Although `package.json` declares pnpm 10+, the scripts call `npm` internally and only `package-lock.json` is committed. The documented development path therefore uses npm.
 
-1. Click the extension icon in your browser toolbar
-2. Enter your Gemini API key in the popup
-3. Click "Save Configuration"
-4. Wait for the success message confirming the API key is valid
+### Build and load
 
-### 4. Start Chatting!
-
-1. Go to any YouTube video (e.g., `https://www.youtube.com/watch?v=...`)
-2. Look for the red "Chat about this video" button on the bottom right corner
-3. Click the button to expand the chat interface
-4. **Type your questions** and press Enter or click Send
-5. **View video history** by clicking the 📺 button in the chat header
-6. Start conversing about the video content!
-
-## Example Questions You Can Ask
-
-- "What is the main topic of this video?"
-- "Can you summarize the key points?"
-- "What does the speaker say about [specific topic]?"
-- "At what time does the speaker mention [something specific]?"
-- "What are the main arguments presented?"
-- "Can you explain [concept] that was mentioned in the video?"
-
-## Video History & Interface Features
-
-### 📺 Video History
-
-- **Automatic Tracking**: Extension automatically tracks videos you chat about
-- **Quick Access**: Click the 📺 button in chat header to view recent videos
-- **Current Video Info**: See current video details at the top of chat
-- **Easy Navigation**: Click → button to quickly jump to any previous video
-- **Smart Storage**: Keeps last 10 videos, stored locally in your browser
-
-### Usage Tips
-
-- **Video Context**: Each video maintains separate chat context - switching videos updates the AI's knowledge
-- **History Persistence**: Video history is saved locally and persists across browser sessions
-- **Performance**: History is limited to 10 videos to maintain optimal performance
-
-### 🖱️ Fixed Position Interface
-
-- **Fixed Location**: Chat button stays in the bottom right corner for consistency
-- **Responsive Design**: Automatically adjusts position on smaller screens
-- **Clean Interface**: Simple, non-intrusive design that doesn't interfere with video watching
-
-## Technical Details
-
-### Architecture
-
-- **Content Script** (`content.js`): Injected into YouTube pages, handles UI and video context extraction
-- **Background Script** (`background.js`): Handles Gemini API communication
-- **Popup** (`popup.html/js`): Extension configuration interface
-- **Styles** (`styles.css`): Chat interface styling
-
-### Video Context Extraction
-
-The extension automatically extracts:
-
-- Video title and description
-- Channel information
-- Video duration and current playback time
-- Transcript (when available)
-- Video URL and metadata
-
-### Privacy & Security
-
-- API keys are stored locally using Chrome's storage.sync API
-- No data is sent to third-party servers except Google's Gemini API
-- All communication is encrypted (HTTPS)
-- The extension only works on YouTube domains
-
-## Development
-
-### File Structure
-
-```
-youtube-helper/
-├── manifest.json         # Extension manifest
-├── content.js           # Main content script
-├── background.js        # Service worker for API calls
-├── styles.css          # Chat interface styles
-├── popup.html          # Extension popup interface
-├── popup.js            # Popup functionality
-├── icons/              # Extension icons (add your own)
-└── README.md           # This file
+```bash
+git clone https://github.com/montasim/youtube-helper.git
+cd youtube-helper
+npm install
+npm run build:extension
 ```
 
-### API Usage
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Select **Load unpacked**.
+4. Choose `extension-dist/`.
+5. Open the extension popup, enter your Gemini key, and save it.
+6. Visit a supported YouTube video page and open the injected chat.
 
-The extension uses the Gemini 2.5 Flash model via REST API:
+For a distributable archive, run `npm run package:extension`; it creates `youtube-video-chat-extension.zip`.
 
-- Endpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
-- Model: `gemini-2.5-flash` (latest free model with best price-performance)
-- Temperature: 0.7 (configurable)
-- Max tokens: 1024 (configurable)
+## How it works
+
+```mermaid
+flowchart LR
+    A[YouTube DOM] --> B[content.js]
+    B --> C[Video context + question]
+    C --> D[background.js]
+    E[Gemini key in chrome.storage.sync] --> D
+    D --> F[Google Gemini API]
+    F --> D
+    D --> B
+    B --> G[Injected chat UI]
+```
+
+`content.js` observes YouTube’s dynamic page, extracts context, maintains recent history, and renders chat. `background.js` owns Gemini requests. `popup.js` stores and optionally validates the API key.
+
+## Gemini request behavior
+
+| Setting | Value |
+| --- | --- |
+| Endpoint | Generative Language API `v1beta` |
+| Model | `gemini-2.5-flash` |
+| Chat temperature | `0.7` |
+| Top K / Top P | `40` / `0.95` |
+| Maximum output tokens | `1024` |
+
+Model availability, quotas, pricing, and API behavior are controlled by Google and may change independently of this extension.
+
+## Permissions
+
+| Permission/scope | Purpose |
+| --- | --- |
+| `activeTab` | Interact with the current supported YouTube tab |
+| `storage` | Store the Gemini API key in browser sync storage |
+| YouTube host access | Inject the chat and read page/video context |
+| Google Generative Language host access | Validate the key and send chat requests |
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run build:extension` | Copy extension assets into `extension-dist/` |
+| `npm run package:extension` | Build and ZIP the extension |
+| `npm run dev:extension` | Build and print unpacked-install guidance |
+| `npm run build` | Build the small TypeScript package entry into `dist/` |
+| `npm test` | Run Jest |
+| `npm run lint:check` | Check ESLint and Prettier |
+
+The TypeScript package entry currently exports only a boilerplate welcome function and is not the runtime extension implementation.
+
+## Important limitations
+
+- Transcript extraction depends on YouTube’s current DOM and transcript availability; disabled captions, language differences, or markup changes can prevent it.
+- The extension sends the complete extracted transcript in one prompt and does not chunk long videos, so model input limits may truncate or reject requests.
+- AI answers can be incomplete or inaccurate; confirm important claims against the video or primary sources.
+- Browser sync storage is convenient, not a dedicated secrets vault. Restrict and rotate exposed API keys.
+- Only Chromium installation is documented and the extension is not linked to a browser-store listing.
+- The repository has license metadata and a Creative Commons statement but no `LICENSE` file containing the license text.
+- The publish workflow runs formatting fixes, versions/tags, and npm publishing on every push to `main`; maintainers should review that release design before enabling it with credentials.
 
 ## Troubleshooting
 
-### Chat Button Not Appearing
+- **No chat button:** confirm the URL is a watch, Shorts, or live page, then reload the extension and tab.
+- **No transcript:** open a video with captions and retry; extraction cannot manufacture a transcript.
+- **API failure:** validate the key in the popup and check Google quota, permissions, network access, and browser console logs.
+- **Old context after navigation:** refresh the page and report the source and destination video URLs if it reproduces.
 
-- Make sure you're on a YouTube video page (not the homepage)
-- Try refreshing the page
-- Check that the extension is enabled in `chrome://extensions/`
+## Contributing and security
 
-### API Key Issues
+Run `npm run lint:check`, `npm test`, and `npm run build:extension` before a pull request. Do not commit API keys or include them in screenshots/logs. Follow [SECURITY.md](SECURITY.md) for private vulnerability reporting.
 
-- Verify your API key is correct and active
-- Check that you have available quota in Google AI Studio
-- Make sure the API key has the necessary permissions
+## Funding
 
-### No Responses from AI
-
-- Check the browser console for error messages
-- Verify your internet connection
-- Try regenerating your API key
-
-### Extension Not Loading
-
-- Make sure you've loaded the unpacked extension correctly
-- Check for any errors in the Extensions page
-- Try reloading the extension
-
-### Video History Issues
-
-- **History Not Showing**: Check if you've visited multiple videos - history appears after 2+ videos
-- **Missing Videos**: Only videos you've opened the chat interface on are tracked
-- **History Cleared**: History is stored locally - clearing browser data will reset it
-- **Navigation Issues**: Ensure popup blockers aren't preventing video navigation
-
----
+Support continued development through [SupportKori](https://www.supportkori.com/montasim).
 
 ## License
 
-[![by-nc-nd/4.0](https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-nd/4.0/)
-
-This project is licensed under the **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)**.
-
-### You are free to:
-
-- **Share** — Copy and redistribute the material in any medium or format.
-
-### Under the following terms:
-
-- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made.
-- **NonCommercial** — You may not use the material for commercial purposes.
-- **NoDerivatives** — If you remix, transform, or build upon the material, you may not distribute the modified material.
-
-For more details, please visit the [Creative Commons License Page](https://creativecommons.org/licenses/by-nc-nd/4.0/).
-
----
-
-## Acknowledgments
-
-Special thanks to the following resources:
-
-1. **Acknowledgment 1** - Short details of acknowledgments 1.
-2. **Acknowledgment 1** - Short details of acknowledgments 2.
-3. **Acknowledgment 1** - Short details of acknowledgments 3.
-
----
-
-## FAQs
-
-### 1. **FAQ1?**
-
-Answer of FAQ1.
-
-### 2. **FAQ2?**
-
-Answer of FAQ2.
-
-### 3. **How do I uninstall the package?**
-
-You can remove the package by running:
-
-```bash
-npm uninstall npm-package-name
-```
-
-or
-
-```bash
-yarn remove npm-package-name
-```
-
-or
-
-```bash
-pnpm remove npm-package-name
-```
-
-or
-
-```bash
-bun remove npm-package-name
-```
-
----
+The project metadata declares [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/), which permits sharing with attribution but prohibits commercial use and distribution of derivatives. A local license file is currently missing; add one before relying on the repository as the authoritative license grant.
 
 ## Author
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="https://avatars.githubusercontent.com/u/95298623?v=4" width="100px" alt="Moon">
-      <a href="https://github.com/montasim">
-        <br>
-          Ｍ♢ＮＴΛＳＩＭ
-        <br>
-      </a>
-    </td>
-  </tr>
-</table>
+Created by [Montasim](https://github.com/montasim).
