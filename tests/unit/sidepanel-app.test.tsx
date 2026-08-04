@@ -63,4 +63,12 @@ describe('Side Panel entry states', () => {
 
         expect(chrome.sidePanel.close).toHaveBeenCalledWith({ windowId: -2 });
     });
+
+    it('offers the external SupportKori action without embedding it', () => {
+        render(<SidePanelApp />);
+
+        expect(
+            screen.getByRole('link', { name: 'Support this project' })
+        ).toHaveAttribute('href', 'https://www.supportkori.com/montasim');
+    });
 });

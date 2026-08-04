@@ -1,11 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PopupApp } from '../../src/ui/popup/popup-app';
 
 const sendMessage = vi.fn();
 
 describe('popup connection workflow', () => {
+    afterEach(cleanup);
+
     beforeEach(() => {
         sendMessage.mockReset();
         sendMessage.mockImplementation((request: { type: string }) => {
@@ -47,5 +49,13 @@ describe('popup connection workflow', () => {
             })
         );
         expect(await screen.findByText('Gemini is connected')).toBeVisible();
+    });
+
+    it('shows the SupportKori action in the popup footer', async () => {
+        render(<PopupApp />);
+
+        expect(
+            await screen.findByRole('link', { name: 'Support this project' })
+        ).toHaveAttribute('href', 'https://www.supportkori.com/montasim');
     });
 });

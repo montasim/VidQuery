@@ -30,6 +30,7 @@ import {
 import { Brand } from '../components/brand';
 import { Button } from '../components/button';
 import { ContextSignal } from '../components/context-signal';
+import { SupportLink } from '../components/support-link';
 
 type View = 'conversation' | 'recent';
 type Message = { id: string; role: 'user' | 'assistant'; text: string };
@@ -252,6 +253,7 @@ export function SidePanelApp() {
                             <History className="h-4 w-4" />
                         )}
                     </Button>
+                    <SupportLink compact />
                     <Button
                         variant="ghost"
                         size="icon"

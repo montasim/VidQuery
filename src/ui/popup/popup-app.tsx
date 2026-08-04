@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Brand } from '../components/brand';
 import { Button } from '../components/button';
+import { SupportLink } from '../components/support-link';
 import {
     sendRuntimeMessage,
     type CredentialStatus,
@@ -274,9 +275,15 @@ export function PopupApp() {
                     {message.text}
                 </div>
             ) : null}
-            <footer className="border-t border-line bg-porcelain px-6 py-4 text-[10px] leading-relaxed text-smoke">
-                <strong className="text-graphite">Private by design.</strong> No
-                intermediary server, account, or saved conversation history.
+            <footer className="flex items-center gap-4 border-t border-line bg-porcelain px-6 py-4">
+                <p className="min-w-0 flex-1 text-[10px] leading-relaxed text-smoke">
+                    <strong className="text-graphite">
+                        Private by design.
+                    </strong>{' '}
+                    No intermediary server, account, or saved conversation
+                    history.
+                </p>
+                <SupportLink />
             </footer>
         </main>
     );
