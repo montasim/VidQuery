@@ -4,7 +4,7 @@ status: accepted
 
 # Use the Chrome Side Panel for conversations and retain a focused popup
 
-Move the primary video-question workspace from a floating element injected over YouTube into Chrome’s Side Panel. Retain the toolbar popup as a focused connection surface for first-time consent, Gemini API-key setup and validation, connection status, and an action that opens the assistant; do not duplicate the API-key form inside the Side Panel.
+Move the primary video-question workspace from a floating element injected over YouTube into Chrome’s Side Panel. Retain a small **Ask this video** launcher on supported YouTube pages so the Side Panel remains discoverable, without placing conversation content over the video. Retain the toolbar popup as a focused connection surface for first-time consent, Gemini API-key setup and validation, connection status, and an action that opens the assistant; do not duplicate the API-key form inside the Side Panel.
 
 ## Considered options
 
@@ -17,6 +17,7 @@ Move the primary video-question workspace from a floating element injected over 
 - Clicking the extension action opens the popup, not the Side Panel directly.
 - The popup owns the Gemini Connection and the one-time AI Processing Consent.
 - The popup’s primary post-setup action opens the Side Panel.
+- A Shadow DOM launcher is mounted only on supported watch, Shorts, and live routes. It survives YouTube single-page navigation and opens the Side Panel through a typed background-worker request triggered by the person’s click.
 - The Side Panel owns the current Video Context, Conversation, loading and error feedback, message edit/retry actions, and Recent Videos.
 - On a supported YouTube watch, Shorts, or live page, a content script collects bounded Video Context locally and reports it to the extension. No general page dump is collected.
 - Video Context is refreshed when the panel opens or the active YouTube video changes. Nothing is sent to Gemini until the person submits a question.

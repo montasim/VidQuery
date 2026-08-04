@@ -11,6 +11,7 @@ export const runtimeRequestSchema = z.discriminatedUnion('type', [
         consented: z.literal(true),
     }),
     z.object({ type: z.literal('credential:remove') }),
+    z.object({ type: z.literal('panel:open') }),
     z.object({ type: z.literal('context:get') }),
     z.object({ type: z.literal('recent:list') }),
     z.object({

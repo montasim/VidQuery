@@ -1,5 +1,9 @@
-import { describe, expect, it } from 'vitest';
-import { buildPrompt } from '../../src/infrastructure/gemini';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+    askGemini,
+    buildPrompt,
+    validateGeminiConnection,
+} from '../../src/infrastructure/gemini';
 import type { VideoContext } from '../../src/domain/schemas';
 
 const context: VideoContext = {
@@ -15,6 +19,8 @@ const context: VideoContext = {
 };
 
 describe('Gemini prompt boundary', () => {
+    afterEach(() => vi.unstubAllGlobals());
+
     it('includes every bounded Video Context field and the question', () => {
         const prompt = buildPrompt('What are the key principles?', context);
         expect(prompt).toContain(context.title);
@@ -29,5 +35,47 @@ describe('Gemini prompt boundary', () => {
         expect(buildPrompt('Summarize it', context)).toContain(
             'Do not invent quotes, timestamps, or claims'
         );
+    });
+
+    it('validates generation access instead of only reading model metadata', async () => {
+        const fetchMock = vi.fn().mockResolvedValue(
+            new Response(
+                JSON.stringify({
+                    candidates: [{ content: { parts: [{ text: 'OK' }] } }],
+                })
+            )
+        );
+        vi.stubGlobal('fetch', fetchMock);
+
+        await validateGeminiConnection('test-api-key');
+
+        expect(fetchMock).toHaveBeenCalledWith(
+            expect.stringContaining('gemini-2.5-flash:generateContent'),
+            expect.objectContaining({ method: 'POST' })
+        );
+    });
+
+    it('turns denied projects into an actionable connection error', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue(
+                new Response(
+                    JSON.stringify({
+                        error: {
+                            message:
+                                'Your project has been denied access. Please contact support.',
+                        },
+                    }),
+                    { status: 403 }
+                )
+            )
+        );
+
+        await expect(
+            askGemini('test-api-key', 'Summarize this.', context)
+        ).rejects.toMatchObject({
+            code: 'credential-invalid',
+            message: expect.stringContaining('another eligible project'),
+        });
     });
 });

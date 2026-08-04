@@ -14,6 +14,7 @@ The V2 extension uses a Chrome Side Panel for conversations and a compact toolba
 ## What it does
 
 - Opens a dedicated conversation workspace in Chrome’s Side Panel.
+- Adds an **Ask this video** launcher to supported YouTube pages.
 - Grounds questions in the current video title, channel, description, URL, duration, playback position, and available transcript.
 - Supports YouTube watch, Shorts, and live-video routes, including single-page navigation between videos.
 - Shows whether transcript context is available before a question is sent.
@@ -74,7 +75,7 @@ For an installable archive, run `pnpm zip`; WXT writes the packaged extension un
 3. Read and confirm the AI-processing disclosure.
 4. Select **Save and validate**. **Save without validation** is available when validation cannot be completed, but the first real question may still fail if the key or model access is invalid.
 5. Open a supported YouTube video.
-6. Reopen the popup and select **Open assistant**.
+6. Select the floating **Ask this video** button, or reopen the popup and select **Open assistant**.
 7. Ask a question in the Side Panel.
 
 Nothing is sent to Gemini merely because the panel is open. The Video Context and question are sent only when the person asks.

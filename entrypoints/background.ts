@@ -22,11 +22,24 @@ export default defineBackground(() => {
     chrome.runtime.onMessage.addListener(
         (
             raw: unknown,
-            _sender,
+            sender,
             sendResponse: (response: RuntimeResponse) => void
         ) => {
             const parsed = runtimeRequestSchema.safeParse(raw);
             if (!parsed.success) return false;
+            if (parsed.data.type === 'panel:open') {
+                void openSidePanel(sender)
+                    .then((data) => sendResponse({ ok: true, data }))
+                    .catch((error: unknown) => {
+                        const appError = toAppError(error);
+                        sendResponse({
+                            ok: false,
+                            code: appError.code,
+                            message: appError.message,
+                        });
+                    });
+                return true;
+            }
             void ready
                 .then(() => handleRequest(parsed.data))
                 .then((data) => sendResponse({ ok: true, data }))
@@ -57,6 +70,20 @@ async function initialize(): Promise<void> {
             error
         );
     }
+}
+
+async function openSidePanel(
+    sender: chrome.runtime.MessageSender
+): Promise<{ opened: true }> {
+    const tabId = sender.tab?.id;
+    if (typeof tabId !== 'number') {
+        throw new AppError(
+            'context-unavailable',
+            'Open the assistant from a supported YouTube video.'
+        );
+    }
+    await chrome.sidePanel.open({ tabId });
+    return { opened: true };
 }
 
 async function handleRequest(request: RuntimeRequest): Promise<unknown> {

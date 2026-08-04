@@ -2,23 +2,30 @@ import { defineContentScript } from 'wxt/utils/define-content-script';
 import { videoContextSchema, type VideoContext } from '../src/domain/schemas';
 import {
     contentRequestSchema,
+    sendRuntimeMessage,
     type ExtensionEvent,
 } from '../src/shared/protocol';
+import { mountAssistantLauncher } from '../src/ui/content/launcher';
 
 const LEGACY_HISTORY_KEY = 'youtube-chat-video-history';
 
 export default defineContentScript({
-    matches: [
-        'https://www.youtube.com/watch*',
-        'https://youtube.com/watch*',
-        'https://www.youtube.com/shorts/*',
-        'https://youtube.com/shorts/*',
-        'https://www.youtube.com/live/*',
-        'https://youtube.com/live/*',
-    ],
+    matches: ['https://www.youtube.com/*', 'https://youtube.com/*'],
     runAt: 'document_idle',
     main() {
         void migrateLegacyHistory();
+        let removeLauncher: (() => void) | null = null;
+        const syncLauncher = () => {
+            if (isSupportedVideoPage() && !removeLauncher) {
+                removeLauncher = mountAssistantLauncher(() =>
+                    sendRuntimeMessage({ type: 'panel:open' })
+                );
+            } else if (!isSupportedVideoPage() && removeLauncher) {
+                removeLauncher();
+                removeLauncher = null;
+            }
+        };
+        syncLauncher();
         chrome.runtime.onMessage.addListener(
             (raw: unknown, _sender, sendResponse) => {
                 if (!contentRequestSchema.safeParse(raw).success) return false;
@@ -31,6 +38,7 @@ export default defineContentScript({
         const announceNavigation = () => {
             if (location.href === previousUrl) return;
             previousUrl = location.href;
+            syncLauncher();
             const event: ExtensionEvent = {
                 type: 'context:changed',
                 url: previousUrl,
@@ -48,6 +56,14 @@ export default defineContentScript({
         );
     },
 });
+
+function isSupportedVideoPage(): boolean {
+    return (
+        location.pathname === '/watch' ||
+        location.pathname.startsWith('/shorts/') ||
+        location.pathname.startsWith('/live/')
+    );
+}
 
 async function extractVideoContext(): Promise<VideoContext> {
     const { video, title } = await waitForVideo();

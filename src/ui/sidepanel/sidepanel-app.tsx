@@ -43,6 +43,7 @@ export function SidePanelApp() {
     const [draft, setDraft] = useState('');
     const [asking, setAsking] = useState(false);
     const [askError, setAskError] = useState<string | null>(null);
+    const [askErrorCode, setAskErrorCode] = useState<string | null>(null);
     const [recentVideos, setRecentVideos] = useState<RecentVideo[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const contextIdRef = useRef<string | null>(null);
@@ -121,6 +122,7 @@ export function SidePanelApp() {
         setDraft('');
         setAsking(true);
         setAskError(null);
+        setAskErrorCode(null);
         try {
             const result = await sendRuntimeMessage<{
                 answer: string;
@@ -140,6 +142,11 @@ export function SidePanelApp() {
             ]);
             void loadRecent();
         } catch (error) {
+            setAskErrorCode(
+                error instanceof Error && 'code' in error
+                    ? String(error.code)
+                    : null
+            );
             setAskError(
                 error instanceof Error
                     ? error.message
@@ -307,15 +314,29 @@ export function SidePanelApp() {
                                     <span className="mt-1 block">
                                         {askError}
                                     </span>
-                                    <Button
-                                        variant="outline"
-                                        size="small"
-                                        className="mt-3 bg-white"
-                                        onClick={retry}
-                                    >
-                                        <RotateCcw className="h-3.5 w-3.5" />
-                                        Try again
-                                    </Button>
+                                    {askErrorCode === 'credential-invalid' ? (
+                                        <Button
+                                            variant="outline"
+                                            size="small"
+                                            className="mt-3 bg-white"
+                                            onClick={() =>
+                                                void openConnectionSetup()
+                                            }
+                                        >
+                                            <KeyRound className="h-3.5 w-3.5" />
+                                            Update Gemini key
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="small"
+                                            className="mt-3 bg-white"
+                                            onClick={retry}
+                                        >
+                                            <RotateCcw className="h-3.5 w-3.5" />
+                                            Try again
+                                        </Button>
+                                    )}
                                 </div>
                             ) : null}
                             <div ref={messagesEndRef} />

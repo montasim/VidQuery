@@ -6,9 +6,16 @@ const API_ROOT = 'https://generativelanguage.googleapis.com/v1beta';
 
 export async function validateGeminiConnection(apiKey: string): Promise<void> {
     const response = await request(
-        `${API_ROOT}/models/${GEMINI_MODEL}`,
+        `${API_ROOT}/models/${GEMINI_MODEL}:generateContent`,
         apiKey,
-        { method: 'GET' }
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: 'Reply with OK.' }] }],
+                generationConfig: { maxOutputTokens: 8 },
+            }),
+        }
     );
     if (!response.ok) await throwProviderError(response);
 }
@@ -101,10 +108,30 @@ async function throwProviderError(response: Response): Promise<never> {
         detail = '';
     }
     if (
-        response.status === 400 ||
-        response.status === 401 ||
-        response.status === 403
+        response.status === 403 &&
+        /project has been denied access/i.test(detail)
     ) {
+        throw new AppError(
+            'credential-invalid',
+            'Google has blocked the project connected to this key. Check the project status in Google AI Studio or connect a key from another eligible project.'
+        );
+    }
+    if (
+        response.status === 403 &&
+        /reported as leaked|blocked.*key/i.test(detail)
+    ) {
+        throw new AppError(
+            'credential-invalid',
+            'Google has blocked this API key. Create a replacement in Google AI Studio, then reconnect it here.'
+        );
+    }
+    if (response.status === 400 && /free tier is not available/i.test(detail)) {
+        throw new AppError(
+            'credential-invalid',
+            'The Gemini free tier is unavailable for this project or region. Choose an eligible project or enable billing in Google AI Studio.'
+        );
+    }
+    if ([400, 401, 403].includes(response.status)) {
         throw new AppError(
             'credential-invalid',
             detail || 'Google rejected this Gemini API key.'

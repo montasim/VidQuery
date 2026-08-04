@@ -19,7 +19,9 @@ Continue using a person’s own Gemini API key to access an eligible free-tier G
 - The vault owns save, retrieve, presence-check, and removal operations. Removing the Gemini Connection clears both the encrypted persistent record and any plaintext session cache.
 - The credential is device-bound and is not synchronized across signed-in browser profiles. Clearing IndexedDB makes existing ciphertext undecryptable and must surface a specific reconnect message rather than silently discarding or replacing it.
 - A one-time migration reads the legacy `geminiApiKey` from `chrome.storage.sync`, validates and imports it into the encrypted vault, then removes the legacy sync value only after the encrypted value can be read back successfully.
-- Setup validates the key and provides actionable invalid-key, permission, quota, and network errors.
+- Setup validates real generation access with a minimal Gemini request rather than treating readable model metadata as proof that the project can generate content.
+- Provider permission failures remain fail-closed. A denied or blocked Google project cannot be bypassed by the extension; the UI identifies the project/key problem, directs the person to Google AI Studio or another eligible project, and offers the connection setup action instead of repeatedly retrying a non-transient 403.
+- Setup and conversations provide actionable invalid-key, denied-project, blocked-key, unsupported-free-tier, quota, and network errors without exposing the credential.
 - First-time setup requires one explicit AI Processing Consent stating that the question and Video Context, including an available transcript, are sent directly to Google.
 - Consent is stored locally and is not requested again unless local extension data is cleared or the consent contract materially changes.
 - Gemini calls occur only in the background worker. Content scripts and React UI entry points never call Gemini directly.
