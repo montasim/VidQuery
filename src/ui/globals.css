@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/manrope';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
+@theme {
+    --font-body: 'Instrument Sans Variable', sans-serif;
+    --font-display: 'Manrope Variable', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --color-porcelain: #f7f7f5;
+    --color-paper: #fefefd;
+    --color-graphite: #171717;
+    --color-carbon: #282826;
+    --color-smoke: #6d6d68;
+    --color-line: #e6e5e1;
+    --color-signal: #e32620;
+    --color-signal-dark: #b91c18;
+    --color-mist: #f0f0ed;
+    --color-success: #277a54;
+    --color-warning: #a45a12;
+    --shadow-panel:
+        0 24px 70px rgb(10 10 10 / 0.18), 0 2px 10px rgb(10 10 10 / 0.08);
+}
+
+@layer base {
+    * {
+        border-color: var(--color-line);
+        scrollbar-color: #c7c6c1 transparent;
+        scrollbar-width: thin;
+    }
+
+    html {
+        background: var(--color-porcelain);
+        font-family: var(--font-body);
+        color: var(--color-graphite);
+        font-synthesis: none;
+    }
+
+    body {
+        min-width: 320px;
+        margin: 0;
+    }
+
+    button,
+    input,
+    textarea {
+        font: inherit;
+    }
+
+    :focus-visible {
+        outline: 3px solid rgb(227 38 32 / 0.28);
+        outline-offset: 2px;
+    }
+}
+
+@keyframes context-pulse {
+    0%,
+    100% {
+        opacity: 0.35;
+        transform: translateY(0);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

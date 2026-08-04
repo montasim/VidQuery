@@ -56,6 +56,8 @@
 /dist
 /extension-dist
 /out
+/.output
+/.wxt
 
 # Next.js build directory.
 .next/
@@ -200,9 +202,6 @@ next-env.d.ts
 
 # npm lockfile
 # package-lock.json
-
-# pnpm lockfile
-pnpm-lock.yaml
 
 # Yarn lockfile
 yarn-lock.json
