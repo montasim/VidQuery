@@ -6,7 +6,7 @@ export function Brand({ compact = false }: { compact?: boolean }) {
             <BrandMark className={compact ? 'h-9 w-9' : 'h-11 w-11'} />
             <div className="min-w-0">
                 <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-smoke">
-                    YouTube Helper
+                    VidQuery
                 </p>
                 <p className="mt-0.5 truncate font-display text-sm font-extrabold tracking-[-0.03em]">
                     Ask this video

@@ -1,11 +1,11 @@
-# YouTube Helper
+# VidQuery
 
-YouTube Helper lets a person ask Gemini questions grounded in the YouTube video they are currently watching while keeping retained data deliberately limited.
+VidQuery lets a person ask Gemini questions grounded in the YouTube video they are currently watching while keeping retained data deliberately limited.
 
 ## Language
 
 **Video Context**:
-The current YouTube video’s title, channel, description, URL, duration, playback position, and available transcript used to ground a question.
+The current YouTube video’s title, channel, full description and links, URL, duration, playback position, available transcript, and a bounded set of comments and replies used to ground a question.
 _Avoid_: Scraped data, page dump
 
 **Conversation**:

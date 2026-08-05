@@ -16,6 +16,8 @@ function context(index: number): VideoContext {
         url: `https://www.youtube.com/watch?v=video-${index}`,
         transcript: index % 2 ? 'Transcript' : null,
         transcriptStatus: index % 2 ? 'available' : 'unavailable',
+        comments: index % 2 ? 'Comment and reply' : '',
+        commentsStatus: index % 2 ? 'available' : 'unavailable',
     };
 }
 
@@ -40,6 +42,7 @@ describe('local app storage', () => {
         expect(app.recentVideos[0]?.id).toBe('video-11');
         expect(JSON.stringify(app.recentVideos)).not.toContain('Transcript');
         expect(JSON.stringify(app.recentVideos)).not.toContain('description');
+        expect(JSON.stringify(app.recentVideos)).not.toContain('Comment');
     });
 
     it('imports valid legacy video navigation records', async () => {

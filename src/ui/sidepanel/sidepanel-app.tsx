@@ -9,7 +9,9 @@ import {
     AlertCircle,
     ArrowLeft,
     ArrowUp,
+    Check,
     Clock3,
+    Copy,
     ExternalLink,
     History,
     KeyRound,
@@ -41,6 +43,7 @@ export function SidePanelApp() {
     const [context, setContext] = useState<VideoContext | null>(null);
     const [contextError, setContextError] = useState<string | null>(null);
     const [loadingContext, setLoadingContext] = useState(true);
+    const [playbackActive, setPlaybackActive] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [draft, setDraft] = useState('');
     const [asking, setAsking] = useState(false);
@@ -89,7 +92,25 @@ export function SidePanelApp() {
     useEffect(() => {
         void Promise.all([loadCredential(), loadContext(), loadRecent()]);
         const runtimeListener = (raw: unknown) => {
-            if (extensionEventSchema.safeParse(raw).success) void loadContext();
+            const event = extensionEventSchema.safeParse(raw);
+            if (!event.success) return;
+            if (event.data.type === 'context:changed') {
+                setPlaybackActive(false);
+                void loadContext();
+                return;
+            }
+            const playback = event.data;
+            if (contextIdRef.current !== playback.videoId) return;
+            setPlaybackActive(playback.playing);
+            setContext((current) =>
+                current
+                    ? {
+                          ...current,
+                          currentTime: playback.currentTime,
+                          duration: playback.duration || current.duration,
+                      }
+                    : current
+            );
         };
         const activatedListener = () => void loadContext();
         const updatedListener: Parameters<
@@ -170,6 +191,18 @@ export function SidePanelApp() {
         );
         setMessages((current) => current.slice(0, Math.max(0, index)));
         setDraft(message.text);
+    };
+
+    const retryAnswer = (answer: Message) => {
+        const answerIndex = messages.findIndex(
+            (message) => message.id === answer.id
+        );
+        const question = messages
+            .slice(0, answerIndex)
+            .findLast((message) => message.role === 'user');
+        if (!question) return;
+        setMessages((current) => current.slice(0, answerIndex));
+        void ask(question.text, false);
     };
 
     const retry = () => {
@@ -299,7 +332,8 @@ export function SidePanelApp() {
                 <EmptyState
                     icon={<LoaderCircle className="h-5 w-5 animate-spin" />}
                     title="Reading this page"
-                    body="Collecting the current video title, playback position, and available transcript."
+                    body="Collecting the description, transcript, comments, replies, and current video metadata."
+                    quiet
                 />
             ) : contextError || !context ? (
                 <EmptyState
@@ -320,8 +354,11 @@ export function SidePanelApp() {
                 </EmptyState>
             ) : (
                 <>
-                    <ContextHeader context={context} />
-                    <section className="flex flex-1 flex-col bg-porcelain">
+                    <ContextHeader
+                        context={context}
+                        playbackActive={playbackActive}
+                    />
+                    <section className="motion-surface flex flex-1 flex-col bg-porcelain">
                         <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
                             {messages.length === 0 ? (
                                 <WelcomeState context={context} />
@@ -330,7 +367,17 @@ export function SidePanelApp() {
                                 <MessageBubble
                                     key={message.id}
                                     message={message}
-                                    onEdit={() => editMessage(message)}
+                                    onEdit={
+                                        message.role === 'user'
+                                            ? () => editMessage(message)
+                                            : undefined
+                                    }
+                                    onRetry={
+                                        message.role === 'assistant'
+                                            ? () => retryAnswer(message)
+                                            : undefined
+                                    }
+                                    retryDisabled={asking}
                                 />
                             ))}
                             {asking ? <Thinking /> : null}
@@ -417,9 +464,17 @@ export function SidePanelApp() {
     );
 }
 
-function ContextHeader({ context }: { context: VideoContext }) {
+function ContextHeader({
+    context,
+    playbackActive,
+}: {
+    context: VideoContext;
+    playbackActive: boolean;
+}) {
+    const progress =
+        context.duration > 0 ? context.currentTime / context.duration : 0;
     return (
-        <section className="border-b border-line bg-paper px-4 py-3">
+        <section className="motion-surface border-b border-line bg-paper px-4 py-3">
             <div className="rounded-xl border border-line bg-porcelain p-3">
                 <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
@@ -437,7 +492,14 @@ function ContextHeader({ context }: { context: VideoContext }) {
                 </div>
                 <div className="mt-2">
                     <ContextSignal
-                        available={context.transcriptStatus === 'available'}
+                        transcriptAvailable={
+                            context.transcriptStatus === 'available'
+                        }
+                        commentsAvailable={
+                            context.commentsStatus === 'available'
+                        }
+                        progress={progress}
+                        active={playbackActive}
                     />
                 </div>
             </div>
@@ -451,15 +513,12 @@ function WelcomeState({ context }: { context: VideoContext }) {
             <span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-graphite text-white">
                 <ArrowUp className="h-5 w-5" />
             </span>
-            <h2 className="mt-4 font-display text-lg font-extrabold tracking-[-0.03em]">
+            <h2 className="mt-4 font-display text-lg font-extrabold tracking-[-0.03em] text-quiet">
                 Ask what the video explains
             </h2>
             <p className="mx-auto mt-2 max-w-72 text-[12px] leading-relaxed text-smoke">
-                Questions use “{context.title}” and{' '}
-                {context.transcript
-                    ? 'its available transcript'
-                    : 'the available video metadata'}{' '}
-                as context.
+                Questions use “{context.title}”, its full description and links,
+                plus any available transcript, comments, and replies.
             </p>
         </div>
     );
@@ -468,28 +527,26 @@ function WelcomeState({ context }: { context: VideoContext }) {
 function MessageBubble({
     message,
     onEdit,
+    onRetry,
+    retryDisabled,
 }: {
     message: Message;
-    onEdit: () => void;
+    onEdit?: () => void;
+    onRetry?: () => void;
+    retryDisabled: boolean;
 }) {
     if (message.role === 'user') {
         return (
-            <div className="max-w-[88%] self-end">
-                <div className="rounded-2xl rounded-br-md bg-graphite px-4 py-3 text-[13px] leading-relaxed text-white">
+            <div className="message-enter-user max-w-[88%] self-end">
+                <div className="rounded-2xl rounded-br-md bg-dialogue px-4 py-3 text-[13px] leading-relaxed text-white">
                     {message.text}
                 </div>
-                <button
-                    onClick={onEdit}
-                    className="mt-1.5 flex items-center gap-1 px-1 text-[10px] font-semibold text-smoke hover:text-graphite"
-                >
-                    <Pencil className="h-3 w-3" />
-                    Edit
-                </button>
+                <MessageActions message={message} onEdit={onEdit} />
             </div>
         );
     }
     return (
-        <div className="max-w-[94%] self-start">
+        <div className="message-enter-assistant max-w-[94%] self-start">
             <div className="rounded-2xl rounded-bl-md border border-line bg-white px-4 py-3 text-[13px] leading-[1.55] text-carbon">
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -544,13 +601,101 @@ function MessageBubble({
                     {message.text}
                 </ReactMarkdown>
             </div>
+            <MessageActions
+                message={message}
+                onRetry={onRetry}
+                retryDisabled={retryDisabled}
+            />
+        </div>
+    );
+}
+
+function MessageActions({
+    message,
+    onEdit,
+    onRetry,
+    retryDisabled = false,
+}: {
+    message: Message;
+    onEdit?: () => void;
+    onRetry?: () => void;
+    retryDisabled?: boolean;
+}) {
+    const [copied, setCopied] = useState(false);
+    const resetCopyTimer = useRef<number | null>(null);
+    const kind = message.role === 'user' ? 'question' : 'answer';
+
+    useEffect(
+        () => () => {
+            if (resetCopyTimer.current !== null)
+                window.clearTimeout(resetCopyTimer.current);
+        },
+        []
+    );
+
+    const copyMessage = async () => {
+        try {
+            await navigator.clipboard.writeText(message.text);
+            setCopied(true);
+            if (resetCopyTimer.current !== null)
+                window.clearTimeout(resetCopyTimer.current);
+            resetCopyTimer.current = window.setTimeout(
+                () => setCopied(false),
+                1600
+            );
+        } catch {
+            setCopied(false);
+        }
+    };
+
+    const iconButtonClass =
+        'grid h-7 w-7 place-items-center rounded-md text-smoke transition hover:bg-white hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-graphite/20 disabled:cursor-not-allowed disabled:opacity-40';
+
+    return (
+        <div className="mt-1 flex min-h-7 items-center justify-end gap-0.5">
+            {onEdit ? (
+                <button
+                    type="button"
+                    onClick={onEdit}
+                    aria-label="Edit question"
+                    title="Edit question"
+                    className={iconButtonClass}
+                >
+                    <Pencil className="h-3.5 w-3.5" />
+                </button>
+            ) : null}
+            {onRetry ? (
+                <button
+                    type="button"
+                    onClick={onRetry}
+                    disabled={retryDisabled}
+                    aria-label="Retry answer"
+                    title="Retry answer"
+                    className={iconButtonClass}
+                >
+                    <RotateCcw className="h-3.5 w-3.5" />
+                </button>
+            ) : null}
+            <button
+                type="button"
+                onClick={() => void copyMessage()}
+                aria-label={`${copied ? 'Copied' : 'Copy'} ${kind}`}
+                title={`${copied ? 'Copied' : 'Copy'} ${kind}`}
+                className={iconButtonClass}
+            >
+                {copied ? (
+                    <Check className="motion-confirm h-3.5 w-3.5" />
+                ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                )}
+            </button>
         </div>
     );
 }
 
 function Thinking() {
     return (
-        <div className="flex items-center gap-2 self-start rounded-2xl rounded-bl-md border border-line bg-white px-4 py-3 text-smoke">
+        <div className="message-enter-assistant flex items-center gap-2 self-start rounded-2xl rounded-bl-md border border-line bg-white px-4 py-3 text-smoke">
             <span className="h-1.5 w-1.5 animate-[context-pulse_1.2s_ease-in-out_infinite] rounded-full bg-signal" />
             <span className="h-1.5 w-1.5 animate-[context-pulse_1.2s_ease-in-out_120ms_infinite] rounded-full bg-signal" />
             <span className="h-1.5 w-1.5 animate-[context-pulse_1.2s_ease-in-out_240ms_infinite] rounded-full bg-signal" />
@@ -577,11 +722,11 @@ function RecentVideos({
             />
         );
     return (
-        <section className="divide-y divide-line">
+        <section className="motion-surface divide-y divide-line">
             {videos.map((video) => (
                 <article
                     key={video.id}
-                    className="flex gap-3 p-4 hover:bg-porcelain"
+                    className="flex gap-3 p-4 transition-colors duration-150 hover:bg-porcelain"
                 >
                     <div className="grid h-[68px] w-24 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-carbon to-[#4b596a] font-mono text-[9px] font-semibold text-white/80">
                         {formatDuration(video.duration)}
@@ -614,19 +759,23 @@ function EmptyState({
     title,
     body,
     children,
+    quiet = false,
 }: {
     icon: React.ReactNode;
     title: string;
     body: string;
     children?: React.ReactNode;
+    quiet?: boolean;
 }) {
     return (
-        <section className="grid flex-1 place-items-center px-7 py-16 text-center">
+        <section className="motion-surface grid flex-1 place-items-center px-7 py-16 text-center">
             <div>
                 <span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-graphite text-white">
                     {icon}
                 </span>
-                <h2 className="mt-4 font-display text-lg font-extrabold tracking-[-0.03em]">
+                <h2
+                    className={`mt-4 font-display text-lg font-extrabold tracking-[-0.03em] ${quiet ? 'text-quiet' : 'text-graphite'}`}
+                >
                     {title}
                 </h2>
                 <p className="mx-auto mt-2 max-w-72 text-[12px] leading-relaxed text-smoke">

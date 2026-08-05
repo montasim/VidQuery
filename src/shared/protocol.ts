@@ -30,10 +30,19 @@ export const contentRequestSchema = z.object({
 });
 export type ContentRequest = z.infer<typeof contentRequestSchema>;
 
-export const extensionEventSchema = z.object({
-    type: z.literal('context:changed'),
-    url: z.string(),
-});
+export const extensionEventSchema = z.discriminatedUnion('type', [
+    z.object({
+        type: z.literal('context:changed'),
+        url: z.string(),
+    }),
+    z.object({
+        type: z.literal('context:playback'),
+        videoId: z.string().min(1),
+        currentTime: z.number().nonnegative(),
+        duration: z.number().nonnegative(),
+        playing: z.boolean(),
+    }),
+]);
 export type ExtensionEvent = z.infer<typeof extensionEventSchema>;
 
 export type RuntimeResponse<T = unknown> =

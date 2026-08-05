@@ -1,6 +1,6 @@
-# YouTube Helper distribution
+# VidQuery distribution
 
-YouTube Helper is built and packaged by WXT as a Chrome Manifest V3 extension. It is not an npm package and this repository does not prove a current Chrome Web Store listing.
+VidQuery is built and packaged by WXT as a Chrome Manifest V3 extension. It is not an npm package and this repository does not prove a current Chrome Web Store listing.
 
 ## Build an unpacked extension
 
@@ -38,13 +38,13 @@ The tag-triggered [Release workflow](.github/workflows/release.yml) publishes th
 5. Create and push the matching annotated tag:
 
     ```bash
-    git tag -a v2.0.0 -m "YouTube Helper v2.0.0"
+    git tag -a v2.0.0 -m "VidQuery v2.0.0"
     git push origin v2.0.0
     ```
 
 The workflow rejects a tag that does not equal `v` plus the version in `package.json`. A successful run publishes:
 
-- `YouTube-Helper-vX.Y.Z-chrome-unpacked.zip`;
+- `VidQuery-vX.Y.Z-chrome-unpacked.zip`;
 - `SHA256SUMS.txt`; and
 - the curated release notes from `.github/RELEASE_NOTES.md`.
 

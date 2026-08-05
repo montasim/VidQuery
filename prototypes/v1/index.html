@@ -7,7 +7,7 @@
             name="description"
             content="V2 interface prototype for YouTube Video Chat Assistant."
         />
-        <title>YouTube Helper — UI Prototype v1</title>
+        <title>VidQuery - UI Prototype v1</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
@@ -18,6 +18,7 @@
                             paper: '#FEFEFD',
                             graphite: '#171717',
                             carbon: '#282826',
+                            dialogue: '#343432',
                             smoke: '#6D6D68',
                             line: '#E6E5E1',
                             signal: '#E32620',
@@ -52,10 +53,25 @@
             }
             body {
                 font-synthesis: none;
+                animation: extension-enter 260ms cubic-bezier(0.16, 1, 0.3, 1)
+                    both;
             }
             button,
             input {
                 -webkit-tap-highlight-color: transparent;
+            }
+            button {
+                transition:
+                    background-color 150ms ease,
+                    border-color 150ms ease,
+                    color 150ms ease,
+                    transform 150ms ease;
+            }
+            button:hover {
+                transform: translateY(-1px);
+            }
+            button:active {
+                transform: translateY(0) scale(0.98);
             }
             button:focus-visible,
             input:focus-visible,
@@ -68,6 +84,8 @@
             }
             .scene.is-active {
                 display: block;
+                animation: surface-enter 220ms cubic-bezier(0.16, 1, 0.3, 1)
+                    both;
             }
             .state-only {
                 display: none;
@@ -82,6 +100,28 @@
                 width: 2px;
                 border-radius: 99px;
                 background: currentColor;
+                transform-origin: center;
+            }
+            .context-signal.is-playing .transcript-wave span {
+                animation: context-wave 760ms ease-in-out infinite alternate;
+                animation-delay: calc(var(--bar-index) * -70ms);
+            }
+            .context-progress,
+            .context-playhead {
+                transition:
+                    width 420ms linear,
+                    left 420ms linear;
+            }
+            .context-signal.is-playing .context-playhead {
+                animation: playhead-breathe 1.6s ease-out infinite;
+            }
+            .message-enter-user {
+                animation: message-enter-user 220ms
+                    cubic-bezier(0.16, 1, 0.3, 1) both;
+            }
+            .message-enter-assistant {
+                animation: message-enter-assistant 260ms
+                    cubic-bezier(0.16, 1, 0.3, 1) both;
             }
             .loading-dot {
                 animation: bounce 1.2s infinite ease-in-out;
@@ -104,12 +144,73 @@
                     opacity: 1;
                 }
             }
+            @keyframes extension-enter {
+                from {
+                    opacity: 0;
+                    transform: translateY(4px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes surface-enter {
+                from {
+                    opacity: 0;
+                    transform: translateY(7px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes message-enter-user {
+                from {
+                    opacity: 0;
+                    transform: translateX(9px) scale(0.985);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+            }
+            @keyframes message-enter-assistant {
+                from {
+                    opacity: 0;
+                    transform: translateX(-9px) scale(0.985);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0) scale(1);
+                }
+            }
+            @keyframes context-wave {
+                from {
+                    opacity: 0.45;
+                    transform: scaleY(0.45);
+                }
+                to {
+                    opacity: 1;
+                    transform: scaleY(1);
+                }
+            }
+            @keyframes playhead-breathe {
+                0%,
+                100% {
+                    box-shadow: 0 0 0 0 rgba(227, 38, 32, 0);
+                }
+                45% {
+                    box-shadow: 0 0 0 4px rgba(227, 38, 32, 0.13);
+                }
+            }
             @media (prefers-reduced-motion: reduce) {
                 *,
                 *::before,
                 *::after {
                     animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
                     scroll-behavior: auto !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
         </style>
@@ -141,7 +242,7 @@
                         </span>
                         <strong
                             class="font-display text-sm font-extrabold tracking-[-.02em]"
-                            >YouTube Helper
+                            >VidQuery
                             <span
                                 class="ml-1 font-mono text-[9px] font-semibold uppercase tracking-[.14em] text-smoke"
                                 >UI v1</span
@@ -307,6 +408,7 @@
                                         class="absolute inset-x-4 bottom-4 flex items-center gap-3 text-white"
                                     >
                                         <button
+                                            data-toggle-playback
                                             class="grid h-9 w-9 place-items-center rounded-full bg-white text-graphite"
                                             aria-label="Play"
                                         >
@@ -315,18 +417,25 @@
                                                 viewBox="0 0 24 24"
                                                 fill="currentColor"
                                             >
-                                                <path d="m9 7 8 5-8 5V7Z" />
+                                                <path
+                                                    id="prototype-play-icon"
+                                                    d="m9 7 8 5-8 5V7Z"
+                                                />
                                             </svg></button
-                                        ><span class="font-mono text-[10px]"
+                                        ><span
+                                            id="prototype-video-time"
+                                            class="font-mono text-[10px]"
                                             >08:42 / 24:18</span
                                         >
                                         <div
                                             class="relative h-1 flex-1 rounded-full bg-white/25"
                                         >
                                             <span
+                                                id="prototype-video-progress"
                                                 class="absolute inset-y-0 left-0 w-[36%] rounded-full bg-signal"
                                             ></span
                                             ><span
+                                                id="prototype-video-playhead"
                                                 class="absolute left-[36%] top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-signal"
                                             ></span>
                                         </div>
@@ -336,7 +445,7 @@
                             <h2
                                 class="mt-4 font-display text-xl font-extrabold tracking-[-.03em]"
                             >
-                                Designing calm product interfaces — a practical
+                                Designing calm product interfaces: a practical
                                 walkthrough
                             </h2>
                             <div class="mt-3 flex flex-wrap items-center gap-3">
@@ -486,33 +595,80 @@
                                                 >Designing calm product
                                                 interfaces</span
                                             ><span
+                                                id="prototype-playback-time"
                                                 class="font-mono text-[9px] font-semibold text-smoke"
-                                                >08:42</span
+                                                >08:42 / 24:18</span
                                             >
                                         </div>
                                         <div
-                                            class="mt-2 flex items-center gap-2 text-signal"
+                                            id="prototype-context-signal"
+                                            class="context-signal is-playing mt-2 flex items-center gap-2 text-signal"
                                         >
                                             <div
                                                 class="transcript-wave flex h-4 items-center gap-[2px]"
                                                 aria-hidden="true"
                                             >
-                                                <span class="h-1.5"></span
-                                                ><span class="h-3"></span
-                                                ><span class="h-2"></span
-                                                ><span class="h-4"></span
-                                                ><span class="h-2.5"></span
-                                                ><span class="h-1"></span
-                                                ><span class="h-3"></span
-                                                ><span class="h-2"></span
-                                                ><span class="h-4"></span
-                                                ><span class="h-2"></span
-                                                ><span class="h-3"></span
-                                                ><span class="h-1.5"></span>
+                                                <span
+                                                    class="h-1.5"
+                                                    style="--bar-index: 0"
+                                                ></span
+                                                ><span
+                                                    class="h-3"
+                                                    style="--bar-index: 1"
+                                                ></span
+                                                ><span
+                                                    class="h-2"
+                                                    style="--bar-index: 2"
+                                                ></span
+                                                ><span
+                                                    class="h-4"
+                                                    style="--bar-index: 3"
+                                                ></span
+                                                ><span
+                                                    class="h-2.5"
+                                                    style="--bar-index: 4"
+                                                ></span
+                                                ><span
+                                                    class="h-1"
+                                                    style="--bar-index: 5"
+                                                ></span
+                                                ><span
+                                                    class="h-3"
+                                                    style="--bar-index: 6"
+                                                ></span
+                                                ><span
+                                                    class="h-2"
+                                                    style="--bar-index: 7"
+                                                ></span
+                                                ><span
+                                                    class="h-4"
+                                                    style="--bar-index: 8"
+                                                ></span
+                                                ><span
+                                                    class="h-2"
+                                                    style="--bar-index: 9"
+                                                ></span
+                                                ><span
+                                                    class="h-3"
+                                                    style="--bar-index: 10"
+                                                ></span
+                                                ><span
+                                                    class="h-1.5"
+                                                    style="--bar-index: 11"
+                                                ></span>
                                             </div>
                                             <div
-                                                class="h-px flex-1 bg-signal/25"
-                                            ></div>
+                                                class="relative h-px flex-1 bg-signal/20"
+                                            >
+                                                <span
+                                                    id="prototype-progress"
+                                                    class="context-progress absolute inset-y-0 left-0 bg-signal"
+                                                ></span>
+                                                <span
+                                                    id="prototype-playhead"
+                                                    class="context-playhead absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal"
+                                                ></span>
+                                            </div>
                                             <span
                                                 class="font-mono text-[8px] font-semibold uppercase tracking-wider"
                                                 >Transcript found</span
@@ -526,34 +682,69 @@
                                     class="flex flex-1 flex-col gap-4 overflow-y-auto bg-[#fafaf8] p-4"
                                     aria-live="polite"
                                 >
-                                    <div class="max-w-[88%] self-end">
+                                    <div
+                                        class="message-enter-user max-w-[88%] self-end"
+                                    >
                                         <div
-                                            class="rounded-2xl rounded-br-md bg-graphite px-4 py-3 text-[13px] leading-relaxed text-white"
+                                            id="prototype-question"
+                                            class="rounded-2xl rounded-br-md bg-dialogue px-4 py-3 text-[13px] leading-relaxed text-white"
                                         >
                                             What are the three principles used
                                             to simplify the dashboard?
                                         </div>
-                                        <button
-                                            data-edit-question
-                                            class="mt-1.5 flex items-center gap-1 px-1 text-[10px] font-semibold text-smoke hover:text-graphite"
+                                        <div
+                                            class="mt-1 flex min-h-7 items-center justify-end gap-0.5"
                                         >
-                                            <svg
-                                                class="h-3 w-3"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="2"
+                                            <button
+                                                data-edit-question
+                                                class="grid h-7 w-7 place-items-center rounded-md text-smoke transition hover:bg-white hover:text-graphite"
+                                                aria-label="Edit question"
+                                                title="Edit question"
                                             >
-                                                <path
-                                                    d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z"
-                                                /></svg
-                                            >Edit
-                                        </button>
+                                                <svg
+                                                    class="h-3.5 w-3.5"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <path
+                                                        d="m4 20 4.5-1 10-10-3.5-3.5-10 10L4 20Z"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                data-copy-target="prototype-question"
+                                                class="grid h-7 w-7 place-items-center rounded-md text-smoke transition hover:bg-white hover:text-graphite"
+                                                aria-label="Copy question"
+                                                title="Copy question"
+                                            >
+                                                <svg
+                                                    class="h-3.5 w-3.5"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <rect
+                                                        width="14"
+                                                        height="14"
+                                                        x="8"
+                                                        y="8"
+                                                        rx="2"
+                                                    />
+                                                    <path
+                                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div
-                                        class="state-only state-ready max-w-[92%] flex-col"
+                                        class="message-enter-assistant state-only state-ready max-w-[92%] flex-col"
                                     >
                                         <div
+                                            id="prototype-answer"
                                             class="rounded-2xl rounded-bl-md border border-line bg-white px-4 py-3 text-[13px] leading-[1.55] text-[#343432]"
                                         >
                                             <p>
@@ -588,25 +779,56 @@
                                                 and the summary lands at 10:12.
                                             </p>
                                         </div>
-                                        <button
-                                            data-retry
-                                            class="mt-1.5 flex items-center gap-1 self-start px-1 text-[10px] font-semibold text-smoke hover:text-graphite"
+                                        <div
+                                            class="mt-1 flex min-h-7 items-center justify-end gap-0.5"
                                         >
-                                            <svg
-                                                class="h-3 w-3"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                stroke-width="2"
+                                            <button
+                                                data-retry
+                                                class="grid h-7 w-7 place-items-center rounded-md text-smoke transition hover:bg-white hover:text-graphite"
+                                                aria-label="Retry answer"
+                                                title="Retry answer"
                                             >
-                                                <path
-                                                    d="M20 6v5h-5M4 18v-5h5"
-                                                />
-                                                <path
-                                                    d="M18.5 9A7 7 0 0 0 6.2 6.2L4 8m16 8-2.2 1.8A7 7 0 0 1 5.5 15"
-                                                /></svg
-                                            >Try again
-                                        </button>
+                                                <svg
+                                                    class="h-3.5 w-3.5"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <path
+                                                        d="M20 6v5h-5M4 18v-5h5"
+                                                    />
+                                                    <path
+                                                        d="M18.5 9A7 7 0 0 0 6.2 6.2L4 8m16 8-2.2 1.8A7 7 0 0 1 5.5 15"
+                                                    />
+                                                </svg>
+                                            </button>
+                                            <button
+                                                data-copy-target="prototype-answer"
+                                                class="grid h-7 w-7 place-items-center rounded-md text-smoke transition hover:bg-white hover:text-graphite"
+                                                aria-label="Copy answer"
+                                                title="Copy answer"
+                                            >
+                                                <svg
+                                                    class="h-3.5 w-3.5"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                >
+                                                    <rect
+                                                        width="14"
+                                                        height="14"
+                                                        x="8"
+                                                        y="8"
+                                                        rx="2"
+                                                    />
+                                                    <path
+                                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div
                                         class="state-only state-loading items-center gap-2 self-start rounded-2xl rounded-bl-md border border-line bg-white px-4 py-3 text-smoke"
@@ -745,7 +967,7 @@
                                     <h2
                                         class="line-clamp-2 text-[13px] font-bold leading-snug"
                                     >
-                                        Designing calm product interfaces — a
+                                        Designing calm product interfaces: a
                                         practical walkthrough
                                     </h2>
                                     <p class="mt-1 text-[10px] text-smoke">
@@ -878,7 +1100,7 @@
                                     <p
                                         class="font-mono text-[9px] font-semibold uppercase tracking-[.15em] text-smoke"
                                     >
-                                        YouTube Helper
+                                        VidQuery
                                     </p>
                                     <h2
                                         class="mt-0.5 font-display text-sm font-extrabold"
@@ -961,7 +1183,7 @@
                                     <p
                                         class="font-mono text-[9px] font-semibold uppercase tracking-[.16em] text-smoke"
                                     >
-                                        YouTube Helper
+                                        VidQuery
                                     </p>
                                     <h1
                                         class="mt-1 font-display text-lg font-extrabold tracking-[-.03em]"
@@ -1104,6 +1326,54 @@
             const statePicker = document.getElementById('state-picker');
             const statePickerWrap =
                 document.getElementById('state-picker-wrap');
+            const playbackDuration = 1458;
+            let playbackSeconds = 522;
+            let playbackActive = true;
+
+            function formatPlaybackTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                return `${minutes}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
+            }
+
+            function renderPlayback() {
+                const progress = Math.min(
+                    1,
+                    playbackSeconds / playbackDuration
+                );
+                const progressPercent = `${progress * 100}%`;
+                const time = `${formatPlaybackTime(playbackSeconds)} / ${formatPlaybackTime(playbackDuration)}`;
+                document.getElementById('prototype-playback-time').textContent =
+                    time;
+                document.getElementById('prototype-video-time').textContent =
+                    time;
+                document.getElementById('prototype-progress').style.width =
+                    progressPercent;
+                document.getElementById('prototype-playhead').style.left =
+                    progressPercent;
+                document.getElementById(
+                    'prototype-video-progress'
+                ).style.width = progressPercent;
+                document.getElementById('prototype-video-playhead').style.left =
+                    progressPercent;
+                document
+                    .getElementById('prototype-context-signal')
+                    .classList.toggle('is-playing', playbackActive);
+                const playbackButton = document.querySelector(
+                    '[data-toggle-playback]'
+                );
+                playbackButton.setAttribute(
+                    'aria-label',
+                    playbackActive ? 'Pause' : 'Play'
+                );
+                document
+                    .getElementById('prototype-play-icon')
+                    .setAttribute(
+                        'd',
+                        playbackActive
+                            ? 'M7 5h4v14H7zM13 5h4v14h-4z'
+                            : 'm9 7 8 5-8 5V7Z'
+                    );
+            }
 
             function render() {
                 document
@@ -1137,7 +1407,26 @@
                     next.searchParams.set('state', currentState);
                 else next.searchParams.delete('state');
                 history.replaceState({}, '', next);
+                renderPlayback();
             }
+
+            document
+                .querySelector('[data-toggle-playback]')
+                .addEventListener('click', () => {
+                    playbackActive = !playbackActive;
+                    renderPlayback();
+                });
+
+            setInterval(() => {
+                if (!playbackActive || currentScene !== 'chat') return;
+                playbackSeconds = Math.min(
+                    playbackDuration,
+                    playbackSeconds + 1
+                );
+                if (playbackSeconds === playbackDuration)
+                    playbackActive = false;
+                renderPlayback();
+            }, 1000);
 
             sceneButtons().forEach((button) =>
                 button.addEventListener('click', () => {
@@ -1163,6 +1452,33 @@
                         currentState = 'ready';
                         render();
                     }, 900);
+                })
+            );
+
+            document.querySelectorAll('[data-copy-target]').forEach((button) =>
+                button.addEventListener('click', async () => {
+                    const target = document.getElementById(
+                        button.dataset.copyTarget
+                    );
+                    if (!target) return;
+                    const originalLabel = button.getAttribute('aria-label');
+                    try {
+                        await navigator.clipboard.writeText(
+                            target.innerText.trim()
+                        );
+                        const copiedLabel = originalLabel.replace(
+                            'Copy',
+                            'Copied'
+                        );
+                        button.setAttribute('aria-label', copiedLabel);
+                        button.setAttribute('title', copiedLabel);
+                        setTimeout(() => {
+                            button.setAttribute('aria-label', originalLabel);
+                            button.setAttribute('title', originalLabel);
+                        }, 1600);
+                    } catch {
+                        button.setAttribute('title', 'Copy failed');
+                    }
                 })
             );
 

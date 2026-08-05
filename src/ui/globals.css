@@ -12,6 +12,8 @@
     --color-paper: #fefefd;
     --color-graphite: #171717;
     --color-carbon: #282826;
+    --color-dialogue: #343432;
+    --color-quiet: #50504c;
     --color-smoke: #6d6d68;
     --color-line: #e6e5e1;
     --color-signal: #e32620;
@@ -40,6 +42,7 @@
     body {
         min-width: 320px;
         margin: 0;
+        animation: extension-enter 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
     button,
@@ -51,6 +54,137 @@
     :focus-visible {
         outline: 3px solid rgb(227 38 32 / 0.28);
         outline-offset: 2px;
+    }
+}
+
+@layer components {
+    .motion-surface {
+        animation: surface-enter 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .message-enter-user {
+        animation: message-enter-user 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .message-enter-assistant {
+        animation: message-enter-assistant 260ms cubic-bezier(0.16, 1, 0.3, 1)
+            both;
+    }
+
+    .context-wave-bar {
+        transition:
+            opacity 180ms ease,
+            transform 180ms ease;
+    }
+
+    .context-signal.is-playing .context-wave-bar {
+        animation: context-wave 760ms ease-in-out infinite alternate;
+    }
+
+    .context-progress,
+    .context-playhead {
+        transition:
+            width 420ms linear,
+            left 420ms linear;
+    }
+
+    .context-signal.is-playing .context-playhead {
+        animation: playhead-breathe 1.6s ease-out infinite;
+    }
+
+    .context-source-label {
+        animation: source-label-enter 240ms ease-out both;
+    }
+
+    .motion-confirm {
+        animation: confirm-pop 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+}
+
+@keyframes extension-enter {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes surface-enter {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes message-enter-user {
+    from {
+        opacity: 0;
+        transform: translateX(9px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes message-enter-assistant {
+    from {
+        opacity: 0;
+        transform: translateX(-9px) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes context-wave {
+    from {
+        opacity: 0.45;
+        transform: scaleY(0.45);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+@keyframes playhead-breathe {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgb(227 38 32 / 0);
+    }
+    45% {
+        box-shadow: 0 0 0 4px rgb(227 38 32 / 0.13);
+    }
+}
+
+@keyframes source-label-enter {
+    from {
+        opacity: 0;
+        transform: translateX(3px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes confirm-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.65) rotate(-8deg);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0);
     }
 }
 
@@ -71,6 +205,8 @@
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
     }
 }

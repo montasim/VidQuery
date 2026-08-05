@@ -21,9 +21,7 @@ describe('YouTube assistant launcher', () => {
         expect(hosts).toHaveLength(1);
         expect(host?.style.right).toBe('22px');
         expect(host?.style.bottom).toBe(host?.style.right);
-        expect(button).toHaveAccessibleName(
-            'Ask this video with YouTube Helper'
-        );
+        expect(button).toHaveAccessibleName('Ask this video with VidQuery');
         button?.click();
         await vi.waitFor(() => expect(openAssistant).toHaveBeenCalledOnce());
     });

@@ -16,6 +16,9 @@ const context: VideoContext = {
     url: 'https://www.youtube.com/watch?v=video-1',
     transcript: 'Clarify the primary action. Group by decision.',
     transcriptStatus: 'available',
+    comments:
+        '[Comment by Ada] The masterclass is at https://example.com/class\n\n[Reply by Sam] Thanks!',
+    commentsStatus: 'available',
 };
 
 describe('Gemini prompt boundary', () => {
@@ -27,8 +30,16 @@ describe('Gemini prompt boundary', () => {
         expect(prompt).toContain(context.channel);
         expect(prompt).toContain(context.description);
         expect(prompt).toContain(context.transcript);
+        expect(prompt).toContain(context.comments);
         expect(prompt).toContain('522 seconds');
         expect(prompt).toContain('What are the key principles?');
+    });
+
+    it('searches every source and preserves complete requested links', () => {
+        const prompt = buildPrompt('Where is the masterclass link?', context);
+        expect(prompt).toContain('Search all supplied sources');
+        expect(prompt).toContain('comments, and replies');
+        expect(prompt).toContain('return complete URLs exactly');
     });
 
     it('instructs Gemini not to invent unsupported video claims', () => {

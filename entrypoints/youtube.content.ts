@@ -1,5 +1,6 @@
 import { defineContentScript } from 'wxt/utils/define-content-script';
 import { videoContextSchema, type VideoContext } from '../src/domain/schemas';
+import { extractVideoSources } from '../src/infrastructure/youtube-context';
 import {
     contentRequestSchema,
     sendRuntimeMessage,
@@ -26,6 +27,66 @@ export default defineContentScript({
             }
         };
         syncLauncher();
+
+        let observedVideo: HTMLVideoElement | null = null;
+        let lastPlaybackSecond = -1;
+        let lastPlaybackState: boolean | null = null;
+        const playbackEvents = [
+            'timeupdate',
+            'play',
+            'pause',
+            'seeking',
+            'durationchange',
+        ] as const;
+        const broadcastPlayback = (force = false) => {
+            if (!observedVideo) return;
+            const videoId = videoIdFrom(location.href);
+            if (!videoId) return;
+            const currentTime = Number.isFinite(observedVideo.currentTime)
+                ? observedVideo.currentTime
+                : 0;
+            const duration = Number.isFinite(observedVideo.duration)
+                ? observedVideo.duration
+                : 0;
+            const playbackSecond = Math.floor(currentTime);
+            const playing = !observedVideo.paused && !observedVideo.ended;
+            if (
+                !force &&
+                playbackSecond === lastPlaybackSecond &&
+                playing === lastPlaybackState
+            )
+                return;
+            lastPlaybackSecond = playbackSecond;
+            lastPlaybackState = playing;
+            const event: ExtensionEvent = {
+                type: 'context:playback',
+                videoId,
+                currentTime,
+                duration,
+                playing,
+            };
+            void chrome.runtime.sendMessage(event).catch(() => undefined);
+        };
+        const syncPlayback = () => {
+            const next = document.querySelector('video');
+            if (next === observedVideo) return;
+            if (observedVideo) {
+                playbackEvents.forEach((event) =>
+                    observedVideo?.removeEventListener(event, onPlayback)
+                );
+            }
+            observedVideo = next instanceof HTMLVideoElement ? next : null;
+            lastPlaybackSecond = -1;
+            lastPlaybackState = null;
+            if (observedVideo) {
+                playbackEvents.forEach((event) =>
+                    observedVideo?.addEventListener(event, onPlayback)
+                );
+                broadcastPlayback(true);
+            }
+        };
+        const onPlayback = () => broadcastPlayback();
+        syncPlayback();
         chrome.runtime.onMessage.addListener(
             (raw: unknown, _sender, sendResponse) => {
                 if (!contentRequestSchema.safeParse(raw).success) return false;
@@ -47,13 +108,13 @@ export default defineContentScript({
         };
         window.addEventListener('popstate', announceNavigation);
         document.addEventListener('yt-navigate-finish', announceNavigation);
-        new MutationObserver(announceNavigation).observe(
-            document.documentElement,
-            {
-                childList: true,
-                subtree: true,
-            }
-        );
+        new MutationObserver(() => {
+            announceNavigation();
+            syncPlayback();
+        }).observe(document.documentElement, {
+            childList: true,
+            subtree: true,
+        });
     },
 });
 
@@ -70,7 +131,7 @@ async function extractVideoContext(): Promise<VideoContext> {
     const url = location.href;
     const id = videoIdFrom(url);
     if (!id) throw new Error('The YouTube video ID is unavailable.');
-    const transcript = await readTranscript();
+    const sources = await extractVideoSources();
     return videoContextSchema.parse({
         id,
         title,
@@ -78,16 +139,14 @@ async function extractVideoContext(): Promise<VideoContext> {
             textOf(
                 '#owner #channel-name a, ytd-channel-name a, #upload-info #channel-name'
             ) || 'Unknown channel',
-        description:
-            document.querySelector<HTMLMetaElement>('meta[name="description"]')
-                ?.content ||
-            textOf('#description-inline-expander, #description') ||
-            '',
+        description: sources.description,
         duration: Number.isFinite(video.duration) ? video.duration : 0,
         currentTime: Number.isFinite(video.currentTime) ? video.currentTime : 0,
         url,
-        transcript,
-        transcriptStatus: transcript ? 'available' : 'unavailable',
+        transcript: sources.transcript,
+        transcriptStatus: sources.transcript ? 'available' : 'unavailable',
+        comments: sources.comments,
+        commentsStatus: sources.comments ? 'available' : 'unavailable',
     });
 }
 
@@ -104,46 +163,6 @@ async function waitForVideo(): Promise<{
         await new Promise((resolve) => setTimeout(resolve, 250));
     }
     throw new Error('A playable YouTube video is not available.');
-}
-
-async function readTranscript(): Promise<string | null> {
-    const existing = transcriptText();
-    if (existing) return existing;
-    const button = [
-        ...document.querySelectorAll<HTMLButtonElement>('button'),
-    ].find((candidate) => {
-        const label = `${candidate.getAttribute('aria-label') ?? ''} ${candidate.textContent ?? ''}`;
-        return /show transcript|transcript/i.test(label);
-    });
-    if (!button) return null;
-    button.click();
-    for (let attempt = 0; attempt < 8; attempt += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 250));
-        const value = transcriptText();
-        if (value) return value;
-    }
-    return null;
-}
-
-function transcriptText(): string | null {
-    const selectors = [
-        'ytd-transcript-segment-renderer .segment-text',
-        'ytd-transcript-segment-renderer yt-formatted-string',
-        '.ytd-transcript-segment-renderer',
-    ];
-    const segments =
-        selectors
-            .map((selector) => [
-                ...document.querySelectorAll<HTMLElement>(selector),
-            ])
-            .find((matches) => matches.length > 0) ?? [];
-    const text = segments
-        .map((segment) => segment.textContent?.trim())
-        .filter((value): value is string => Boolean(value))
-        .join(' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-    return text || null;
 }
 
 function textOf(selector: string): string {

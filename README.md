@@ -1,11 +1,11 @@
-# YouTube Helper
+# VidQuery
 
 > Ask Gemini questions grounded in the YouTube video you are watching, from a focused Chrome Side Panel.
 
 [![CI](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml)
 [![Support on SupportKori](https://img.shields.io/badge/Support_on-SupportKori-00B8B5)](https://www.supportkori.com/montasim)
 
-YouTube Helper is a Chromium extension for people who want to question a video without moving its transcript and metadata into a separate chat tool. Open a YouTube watch, Shorts, or live-video page; the extension collects a bounded Video Context locally and sends it directly to Google Gemini only after you submit a question.
+VidQuery is a Chromium extension for people who want to question a video without moving its transcript and metadata into a separate chat tool. Open a YouTube watch, Shorts, or live-video page; the extension collects a bounded Video Context locally and sends it directly to Google Gemini only after you submit a question.
 
 The V2 extension uses a Chrome Side Panel for conversations and a compact toolbar popup for consent and Gemini connection setup. It has no intermediary backend, account, analytics service, or persistent conversation archive.
 
@@ -15,7 +15,7 @@ The V2 extension uses a Chrome Side Panel for conversations and a compact toolba
 
 - Opens a dedicated conversation workspace in Chrome’s Side Panel.
 - Adds an **Ask this video** launcher to supported YouTube pages.
-- Grounds questions in the current video title, channel, description, URL, duration, playback position, and available transcript.
+- Grounds questions in the current video title, channel, full description and links, URL, duration, playback position, available transcript, comments, and replies.
 - Supports YouTube watch, Shorts, and live-video routes, including single-page navigation between videos.
 - Shows whether transcript context is available before a question is sent.
 - Renders structured Gemini answers, including lists, links, and code.
@@ -29,7 +29,7 @@ The V2 extension uses a Chrome Side Panel for conversations and a compact toolba
 Once a release has been published by the tag workflow:
 
 1. Open [GitHub Releases](https://github.com/montasim/youtube-helper/releases).
-2. Download `YouTube-Helper-vX.Y.Z-chrome-unpacked.zip` and `SHA256SUMS.txt`.
+2. Download `VidQuery-vX.Y.Z-chrome-unpacked.zip` and `SHA256SUMS.txt`.
 3. Place both files in the same folder and verify the download:
 
     ```bash
@@ -64,13 +64,13 @@ pnpm build
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
 4. Choose `.output/chrome-mv3/` from this repository.
-5. Pin YouTube Helper to the browser toolbar if desired.
+5. Pin VidQuery to the browser toolbar if desired.
 
 For an installable archive, run `pnpm zip`; WXT writes the packaged extension under `.output/`.
 
 ## First use
 
-1. Select the YouTube Helper toolbar icon.
+1. Select the VidQuery toolbar icon.
 2. Paste your Gemini API key.
 3. Read and confirm the AI-processing disclosure.
 4. Select **Save and validate**. **Save without validation** is available when validation cannot be completed, but the first real question may still fail if the key or model access is invalid.
@@ -91,7 +91,8 @@ When a question is submitted, the following can be sent directly to Google’s G
 - video title and channel;
 - description and URL;
 - duration and current playback position;
-- available transcript text; and
+- available transcript text;
+- loaded comments and replies; and
 - the person’s question.
 
 No project-operated backend receives this data. Google controls Gemini availability, quotas, retention, and data handling. Google states that free-tier content may be used to improve its products; review the [Gemini API pricing and data-use table](https://ai.google.dev/gemini-api/docs/pricing) and [Gemini API terms](https://ai.google.dev/gemini-api/terms) before sending sensitive material.
@@ -160,7 +161,7 @@ docs/adr/                Accepted architecture decisions
 
 ## Current limitations
 
-- Transcript extraction depends on YouTube’s current rendered controls and markup. Videos without captions, unavailable transcript controls, language variants, or future DOM changes can leave the assistant with metadata-only context.
+- Description, transcript, comment, and reply extraction depends on YouTube’s current rendered controls and markup. VidQuery loads a bounded set of comments and replies when possible; disabled comments, unavailable captions, or future YouTube DOM changes can leave some sources unavailable.
 - The complete extracted transcript is sent in one Gemini request. Very long transcripts may exceed provider limits.
 - Gemini responses can be incomplete or inaccurate. Verify important claims against the video and primary sources.
 - Free-tier availability, model access, quotas, and data use are controlled by Google and may change independently of this extension.

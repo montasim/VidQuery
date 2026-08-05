@@ -14,7 +14,7 @@ Reports are reviewed according to severity and reproducibility. A response-time 
 
 ## Sensitive boundaries
 
-YouTube Helper treats these areas as security-sensitive:
+VidQuery treats these areas as security-sensitive:
 
 - the device-bound encrypted Gemini credential vault;
 - migration from legacy `chrome.storage.sync` credentials;

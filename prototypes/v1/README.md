@@ -1,4 +1,4 @@
-# YouTube Helper UI prototype v1
+# VidQuery UI prototype v1
 
 This folder is a standalone visual prototype for the extension’s V2 interface. It does not change the production extension.
 

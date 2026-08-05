@@ -12,6 +12,8 @@ export const videoContextSchema = z.object({
     url: z.string().url(),
     transcript: z.string().nullable(),
     transcriptStatus: transcriptStatusSchema,
+    comments: z.string().default(''),
+    commentsStatus: transcriptStatusSchema.default('unavailable'),
 });
 export type VideoContext = z.infer<typeof videoContextSchema>;
 
@@ -21,6 +23,8 @@ export const recentVideoSchema = videoContextSchema
         currentTime: true,
         transcript: true,
         transcriptStatus: true,
+        comments: true,
+        commentsStatus: true,
     })
     .extend({ visitedAt: z.string().datetime() });
 export type RecentVideo = z.infer<typeof recentVideoSchema>;

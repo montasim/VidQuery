@@ -117,7 +117,7 @@ export function PopupApp() {
                     <LoaderCircle className="h-5 w-5 animate-spin" />
                 </div>
             ) : connected ? (
-                <section className="space-y-4 p-6">
+                <section className="motion-surface space-y-4 p-6">
                     <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
                         <div className="flex items-start gap-3">
                             <span className="grid h-8 w-8 place-items-center rounded-full bg-success text-white">
@@ -162,7 +162,7 @@ export function PopupApp() {
                 </section>
             ) : (
                 <form
-                    className="space-y-4 p-6"
+                    className="motion-surface space-y-4 p-6"
                     onSubmit={(event) => void save(event, true)}
                 >
                     <div>
@@ -193,7 +193,7 @@ export function PopupApp() {
                                 }
                                 placeholder="Paste your API key"
                                 autoComplete="off"
-                                className="h-11 w-full rounded-xl border border-[#cac9c4] bg-porcelain px-3 pr-11 font-mono text-[11px] outline-none focus:border-graphite focus:bg-white"
+                                className="h-11 w-full rounded-xl border border-[#cac9c4] bg-porcelain px-3 pr-11 font-mono text-[11px] outline-none transition-[background-color,border-color,box-shadow] duration-200 focus:border-graphite focus:bg-white focus:shadow-[0_0_0_3px_rgb(23_23_23_/_0.05)]"
                             />
                             <button
                                 type="button"
@@ -224,8 +224,9 @@ export function PopupApp() {
                             <strong className="text-graphite">
                                 Allow AI processing.
                             </strong>{' '}
-                            Your question and this video’s context, including an
-                            available transcript, go directly to Google Gemini.{' '}
+                            Your question and this video’s context—including its
+                            description, links, available transcript, comments,
+                            and replies—go directly to Google Gemini.{' '}
                             <a
                                 href="https://ai.google.dev/gemini-api/terms"
                                 target="_blank"
@@ -270,7 +271,7 @@ export function PopupApp() {
             {message ? (
                 <div
                     role="status"
-                    className={`mx-6 mb-5 rounded-xl border p-3 text-[11px] font-semibold leading-relaxed ${message.kind === 'success' ? 'border-emerald-200 bg-emerald-50 text-success' : 'border-red-200 bg-red-50 text-red-700'}`}
+                    className={`motion-surface mx-6 mb-5 rounded-xl border p-3 text-[11px] font-semibold leading-relaxed ${message.kind === 'success' ? 'border-emerald-200 bg-emerald-50 text-success' : 'border-red-200 bg-red-50 text-red-700'}`}
                 >
                     {message.text}
                 </div>

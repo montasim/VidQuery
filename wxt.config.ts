@@ -8,8 +8,8 @@ export default defineConfig({
     publicDir: 'icons',
     vite: () => ({ plugins: [tailwindcss()] }),
     manifest: {
-        name: 'YouTube Helper',
-        short_name: 'YouTube Helper',
+        name: 'VidQuery',
+        short_name: 'VidQuery',
         description:
             'Ask Gemini questions grounded in the YouTube video you are watching.',
         minimum_chrome_version: '141',
@@ -19,7 +19,7 @@ export default defineConfig({
             'https://generativelanguage.googleapis.com/*',
         ],
         action: {
-            default_title: 'YouTube Helper',
+            default_title: 'VidQuery',
             default_popup: 'popup.html',
             default_icon: {
                 16: '16.png',
