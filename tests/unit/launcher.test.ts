@@ -15,9 +15,12 @@ describe('YouTube assistant launcher', () => {
         mountAssistantLauncher(openAssistant);
 
         const hosts = document.querySelectorAll('#youtube-helper-launcher');
+        const host = hosts[0] as HTMLElement | undefined;
         const button = hosts[0]?.shadowRoot?.querySelector('button');
 
         expect(hosts).toHaveLength(1);
+        expect(host?.style.right).toBe('22px');
+        expect(host?.style.bottom).toBe(host?.style.right);
         expect(button).toHaveAccessibleName(
             'Ask this video with YouTube Helper'
         );

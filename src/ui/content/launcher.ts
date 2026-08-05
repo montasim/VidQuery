@@ -10,7 +10,7 @@ export function mountAssistantLauncher(
     host.style.cssText = [
         'position:fixed',
         'right:22px',
-        'bottom:88px',
+        'bottom:22px',
         'z-index:2147483647',
     ].join(';');
 
