@@ -24,8 +24,8 @@ const links = [
 
 export function SiteHeader() {
     return (
-        <header className="fixed inset-x-0 top-0 z-50 border-b border-hairline/80 bg-paper/90 backdrop-blur-xl">
-            <div className="mx-auto flex h-16 max-w-[1440px] items-center px-5 sm:px-8 lg:px-12">
+        <header className="fixed inset-x-0 top-0 z-50 border-b border-hairline/80 bg-paper/90 px-5 backdrop-blur-xl sm:px-8 lg:px-12">
+            <div className="mx-auto flex h-16 max-w-[1440px] items-center">
                 <a
                     href="#top"
                     className="flex items-center gap-2.5"
