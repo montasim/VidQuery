@@ -1,0 +1,316 @@
+@import '@fontsource-variable/manrope';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #fcfcfd;
+  --foreground: #161719;
+  --card: #ffffff;
+  --card-foreground: #161719;
+  --popover: #ffffff;
+  --popover-foreground: #161719;
+  --primary: #161719;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f5f7;
+  --secondary-foreground: #161719;
+  --muted: #f3f5f7;
+  --muted-foreground: #69717a;
+  --accent: #f3f5f7;
+  --accent-foreground: #161719;
+  --destructive: #e32620;
+  --border: #d8dee5;
+  --input: #d8dee5;
+  --ring: #e32620;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --font-sans: 'Instrument Sans Variable', sans-serif;
+  --font-display: 'Manrope Variable', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-signal: #e32620;
+  --color-signal-dark: #b91c18;
+  --color-ink: #161719;
+  --color-paper: #fcfcfd;
+  --color-cloud: #f3f5f7;
+  --color-steel: #69717a;
+  --color-hairline: #d8dee5;
+  --shadow-product:
+    0 28px 80px rgba(22, 23, 25, 0.14), 0 3px 12px rgba(22, 23, 25, 0.06);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+* {
+  box-sizing: border-box;
+  border-color: var(--border);
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Instrument Sans Variable', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: #e32620;
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 3px solid rgba(227, 38, 32, 0.3);
+  outline-offset: 3px;
+}
+
+.display-tight {
+  letter-spacing: -0.062em;
+}
+
+.nav-link {
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.75rem;
+  color: #69717a;
+  font-size: 0.875rem;
+  font-weight: 650;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.nav-link:hover {
+  background: #f3f5f7;
+  color: #161719;
+}
+
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  padding: 8rem 1.25rem 5rem;
+}
+
+.hero-glow {
+  pointer-events: none;
+  position: absolute;
+  top: 2.5rem;
+  right: -14rem;
+  width: 35rem;
+  height: 35rem;
+  border-radius: 999px;
+  background: #edf0f3;
+  filter: blur(64px);
+}
+
+.demo-label {
+  position: absolute;
+  top: -1.25rem;
+  left: -1.25rem;
+  display: none;
+  color: #69717a;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.demo-viewport {
+  container-type: inline-size;
+  aspect-ratio: 7 / 5;
+}
+
+.demo-canvas {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 1400px;
+  height: 1000px;
+  transform: scale(calc(100cqw / 1400px));
+  transform-origin: top left;
+}
+
+.demo-canvas iframe {
+  width: 1400px;
+  height: 1000px;
+  border: 0;
+  background: #ffffff;
+}
+
+.context-wave span {
+  width: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: center;
+  animation: context-wave 760ms ease-in-out infinite alternate;
+  animation-delay: calc(var(--bar) * -70ms);
+}
+
+.section-shell {
+  padding: 6rem 1.25rem;
+}
+
+.eyebrow {
+  color: #e32620;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  margin-top: 1.25rem;
+  font-family: 'Manrope Variable', sans-serif;
+  font-size: clamp(2.25rem, 6vw, 3.75rem);
+  font-weight: 900;
+  letter-spacing: -0.062em;
+  line-height: 0.95;
+}
+
+.section-copy {
+  max-width: 42rem;
+  margin-top: 1.5rem;
+  color: #69717a;
+  font-size: 1.125rem;
+  line-height: 2rem;
+}
+
+.source-list {
+  position: relative;
+}
+
+.source-node {
+  position: relative;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #d8dee5;
+}
+
+.source-node:first-child {
+  padding-top: 0;
+}
+
+.source-node:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+@keyframes context-wave {
+  from {
+    opacity: 0.45;
+    transform: scaleY(0.45);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@media (min-width: 640px) {
+  .hero-section {
+    padding-inline: 2rem;
+    padding-top: 10rem;
+  }
+
+  .section-shell {
+    padding: 8rem 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .source-list {
+    margin-left: 1.5rem;
+    padding-left: 1.5rem;
+    border-left: 1px solid rgba(227, 38, 32, 0.35);
+  }
+
+  .source-node::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -1.8rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    border: 2px solid #e32620;
+    border-radius: 999px;
+    background: #fcfcfd;
+    transform: translateY(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-section {
+    padding-inline: 3rem;
+    padding-bottom: 7rem;
+  }
+
+  .demo-label {
+    display: block;
+  }
+
+  .section-shell {
+    padding-inline: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

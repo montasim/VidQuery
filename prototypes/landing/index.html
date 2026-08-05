@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="VidQuery lets you ask questions grounded in the YouTube video you are watching."
+        />
+        <title>VidQuery - Ask the video</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            signal: '#E32620',
+                            signalDark: '#B91C18',
+                            ink: '#161719',
+                            cloud: '#F3F5F7',
+                            paper: '#FCFCFD',
+                            steel: '#69717A',
+                            hairline: '#D8DEE5',
+                        },
+                        boxShadow: {
+                            product:
+                                '0 36px 100px rgba(22, 23, 25, .14), 0 4px 18px rgba(22, 23, 25, .07)',
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            :root {
+                color-scheme: light;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                background: #fcfcfd;
+                color: #161719;
+                font-family:
+                    ui-sans-serif,
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    'Segoe UI',
+                    sans-serif;
+                font-synthesis: none;
+            }
+
+            button,
+            a {
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            :focus-visible {
+                outline: 3px solid rgba(227, 38, 32, 0.3);
+                outline-offset: 3px;
+            }
+
+            .display-tight {
+                letter-spacing: -0.062em;
+            }
+
+            .context-wave span {
+                width: 2px;
+                border-radius: 999px;
+                background: currentColor;
+                transform-origin: center;
+                animation: context-wave 760ms ease-in-out infinite alternate;
+                animation-delay: calc(var(--bar) * -70ms);
+            }
+
+            .reveal {
+                opacity: 0;
+                transform: translateY(18px);
+                transition:
+                    opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+                    transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .reveal.is-visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .demo-canvas {
+                width: 1400px;
+                height: 1000px;
+                transform-origin: top left;
+            }
+
+            .demo-canvas iframe {
+                width: 1400px;
+                height: 1000px;
+                border: 0;
+                background: #fff;
+            }
+
+            .source-node::before {
+                display: none;
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: -1.55rem;
+                width: 0.5rem;
+                height: 0.5rem;
+                border-radius: 999px;
+                border: 2px solid #e32620;
+                background: #fcfcfd;
+                transform: translateY(-50%);
+            }
+
+            @media (min-width: 768px) {
+                .source-node::before {
+                    display: block;
+                }
+            }
+
+            details[open] .faq-plus {
+                transform: rotate(45deg);
+            }
+
+            @keyframes context-wave {
+                from {
+                    opacity: 0.42;
+                    transform: scaleY(0.45);
+                }
+                to {
+                    opacity: 1;
+                    transform: scaleY(1);
+                }
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+                html {
+                    scroll-behavior: auto !important;
+                }
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+
+                .reveal {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        </style>
+    </head>
+    <body
+        class="overflow-x-hidden bg-paper antialiased selection:bg-signal selection:text-white"
+    >
+        <header
+            class="fixed inset-x-0 top-0 z-50 border-b border-hairline/80 bg-paper/90 backdrop-blur-xl"
+        >
+            <nav
+                class="mx-auto flex h-[72px] max-w-[1440px] items-center px-5 sm:px-8 lg:px-12"
+                aria-label="Primary navigation"
+            >
+                <a
+                    href="#top"
+                    class="flex items-center gap-2.5"
+                    aria-label="VidQuery home"
+                >
+                    <img
+                        src="../../assets/brand/logo.svg"
+                        alt=""
+                        class="h-8 w-8"
+                    />
+                    <span class="text-[15px] font-extrabold tracking-[-0.035em]"
+                        >VidQuery</span
+                    >
+                </a>
+
+                <div class="ml-auto hidden items-center gap-7 md:flex">
+                    <a
+                        href="#how"
+                        class="text-sm font-semibold text-steel transition hover:text-ink"
+                        >How it works</a
+                    >
+                    <a
+                        href="#privacy"
+                        class="text-sm font-semibold text-steel transition hover:text-ink"
+                        >Privacy</a
+                    >
+                    <a
+                        href="#install"
+                        class="text-sm font-semibold text-steel transition hover:text-ink"
+                        >Install</a
+                    >
+                    <a
+                        href="https://github.com/montasim/VidQuery"
+                        target="_blank"
+                        rel="noreferrer"
+                        class="text-sm font-semibold text-steel transition hover:text-ink"
+                        >GitHub ↗</a
+                    >
+                    <a
+                        href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                        class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#303238]"
+                        >Download v2.0.0</a
+                    >
+                </div>
+
+                <button
+                    id="menu-toggle"
+                    type="button"
+                    class="ml-auto grid h-10 w-10 place-items-center rounded-xl border border-hairline text-lg md:hidden"
+                    aria-expanded="false"
+                    aria-controls="mobile-menu"
+                    aria-label="Open navigation"
+                >
+                    <span aria-hidden="true">☰</span>
+                </button>
+            </nav>
+
+            <div
+                id="mobile-menu"
+                class="hidden border-t border-hairline bg-paper px-5 py-4 md:hidden"
+            >
+                <div class="grid gap-1">
+                    <a
+                        href="#how"
+                        class="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-cloud"
+                        >How it works</a
+                    >
+                    <a
+                        href="#privacy"
+                        class="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-cloud"
+                        >Privacy</a
+                    >
+                    <a
+                        href="#install"
+                        class="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-cloud"
+                        >Install</a
+                    >
+                    <a
+                        href="https://github.com/montasim/VidQuery"
+                        class="rounded-lg px-3 py-3 text-sm font-semibold hover:bg-cloud"
+                        >GitHub ↗</a
+                    >
+                </div>
+            </div>
+        </header>
+
+        <main id="top">
+            <section
+                class="relative overflow-hidden px-5 pb-20 pt-32 sm:px-8 sm:pt-40 lg:px-12 lg:pb-28"
+            >
+                <div
+                    class="pointer-events-none absolute -right-56 top-10 h-[560px] w-[560px] rounded-full bg-[#edf0f3] blur-3xl"
+                    aria-hidden="true"
+                ></div>
+                <div
+                    class="relative mx-auto grid max-w-[1440px] items-center gap-16 lg:grid-cols-[0.82fr_1.18fr] lg:gap-12"
+                >
+                    <div class="max-w-[680px]">
+                        <div class="mb-7 flex items-center gap-3 text-signal">
+                            <span
+                                class="context-wave flex h-5 items-center gap-[3px]"
+                                aria-hidden="true"
+                            >
+                                <span style="height: 7px; --bar: 0"></span>
+                                <span style="height: 16px; --bar: 1"></span>
+                                <span style="height: 10px; --bar: 2"></span>
+                                <span style="height: 19px; --bar: 3"></span>
+                                <span style="height: 12px; --bar: 4"></span>
+                                <span style="height: 6px; --bar: 5"></span>
+                                <span style="height: 15px; --bar: 6"></span>
+                                <span style="height: 9px; --bar: 7"></span>
+                            </span>
+                            <span class="h-px w-10 bg-signal/35"></span>
+                            <span
+                                class="font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
+                                >Context ready</span
+                            >
+                        </div>
+
+                        <h1
+                            class="display-tight max-w-[640px] text-[3.25rem] font-black leading-[0.9] sm:text-[clamp(4.2rem,5.8vw,6rem)]"
+                        >
+                            The answer is already in the video.
+                            <span class="mt-3 block text-signal"
+                                >Ask for it.</span
+                            >
+                        </h1>
+
+                        <p
+                            class="mt-8 max-w-[590px] text-lg leading-8 text-steel sm:text-xl"
+                        >
+                            VidQuery reads the description, transcript,
+                            comments, and replies beside YouTube, then grounds
+                            Gemini answers in that context.
+                        </p>
+
+                        <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+                            <a
+                                href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                                class="inline-flex min-h-12 items-center justify-center rounded-xl bg-signal px-5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-signalDark"
+                                >Download for Chrome
+                                <span class="ml-2" aria-hidden="true"
+                                    >↓</span
+                                ></a
+                            >
+                            <a
+                                href="#demo"
+                                class="inline-flex min-h-12 items-center justify-center rounded-xl border border-hairline bg-white px-5 text-sm font-extrabold transition hover:-translate-y-0.5 hover:border-[#b9c0c8]"
+                                >See it beside YouTube</a
+                            >
+                        </div>
+
+                        <p
+                            class="mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-steel"
+                        >
+                            Chrome 141+ · Gemini API key required · No account
+                        </p>
+                    </div>
+
+                    <div id="demo" class="relative min-w-0 lg:pt-8">
+                        <div
+                            class="absolute -left-5 -top-5 hidden font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel lg:block"
+                        >
+                            Live product prototype
+                        </div>
+                        <div
+                            class="overflow-hidden rounded-[24px] border border-hairline bg-white shadow-product"
+                        >
+                            <div
+                                class="flex h-11 items-center border-b border-hairline bg-cloud/80 px-4"
+                            >
+                                <div class="flex gap-1.5" aria-hidden="true">
+                                    <span
+                                        class="h-2.5 w-2.5 rounded-full bg-[#c8cdd3]"
+                                    ></span>
+                                    <span
+                                        class="h-2.5 w-2.5 rounded-full bg-[#c8cdd3]"
+                                    ></span>
+                                    <span
+                                        class="h-2.5 w-2.5 rounded-full bg-[#c8cdd3]"
+                                    ></span>
+                                </div>
+                                <div
+                                    class="mx-auto flex rounded-lg border border-hairline bg-white p-0.5 text-[10px] font-bold"
+                                >
+                                    <button
+                                        class="demo-tab rounded-md bg-ink px-2.5 py-1.5 text-white"
+                                        data-scene="chat"
+                                    >
+                                        Conversation
+                                    </button>
+                                    <button
+                                        class="demo-tab rounded-md px-2.5 py-1.5 text-steel"
+                                        data-scene="history"
+                                    >
+                                        Recent
+                                    </button>
+                                    <button
+                                        class="demo-tab rounded-md px-2.5 py-1.5 text-steel"
+                                        data-scene="settings"
+                                    >
+                                        Setup
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                id="demo-viewport"
+                                class="relative overflow-hidden bg-[#f8f9fa]"
+                            >
+                                <div id="demo-canvas" class="demo-canvas">
+                                    <iframe
+                                        id="product-demo"
+                                        src="../v1/index.html?embed=1&scene=chat&state=ready"
+                                        title="Interactive VidQuery extension prototype"
+                                        loading="eager"
+                                    ></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="border-y border-hairline bg-cloud/70 px-5 py-6 sm:px-8 lg:px-12"
+            >
+                <div
+                    class="mx-auto grid max-w-[1440px] gap-4 text-center sm:grid-cols-3 sm:text-left"
+                >
+                    <p
+                        class="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-steel"
+                    >
+                        <span class="mr-2 text-signal">01</span>No intermediary
+                        backend
+                    </p>
+                    <p
+                        class="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-steel"
+                    >
+                        <span class="mr-2 text-signal">02</span>Device-bound key
+                        encryption
+                    </p>
+                    <p
+                        class="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-steel"
+                    >
+                        <span class="mr-2 text-signal">03</span>Context sent
+                        only when you ask
+                    </p>
+                </div>
+            </section>
+
+            <section id="how" class="px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+                <div class="mx-auto max-w-[1240px]">
+                    <div class="reveal max-w-3xl">
+                        <p
+                            class="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-signal"
+                        >
+                            What VidQuery can read
+                        </p>
+                        <h2
+                            class="display-tight mt-5 text-4xl font-black leading-[0.95] sm:text-6xl"
+                        >
+                            One question. Every useful layer around the video.
+                        </h2>
+                        <p class="mt-6 max-w-2xl text-lg leading-8 text-steel">
+                            A video is more than pixels. VidQuery gathers the
+                            source material people normally search by hand and
+                            gives Gemini a bounded context to answer from.
+                        </p>
+                    </div>
+
+                    <div
+                        class="mt-16 grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-24"
+                    >
+                        <div
+                            class="reveal relative border-signal/35 md:ml-6 md:border-l md:pl-6"
+                        >
+                            <div
+                                class="source-node relative border-b border-hairline py-6 first:pt-0"
+                            >
+                                <p
+                                    class="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel"
+                                >
+                                    Description + links
+                                </p>
+                                <h3 class="mt-2 text-xl font-extrabold">
+                                    The details under “more”
+                                </h3>
+                                <p class="mt-2 text-sm leading-6 text-steel">
+                                    Full destinations are preserved, even when
+                                    YouTube shortens the visible URL.
+                                </p>
+                            </div>
+                            <div
+                                class="source-node relative border-b border-hairline py-6"
+                            >
+                                <p
+                                    class="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel"
+                                >
+                                    Transcript
+                                </p>
+                                <h3 class="mt-2 text-xl font-extrabold">
+                                    What was actually said
+                                </h3>
+                                <p class="mt-2 text-sm leading-6 text-steel">
+                                    Timestamped segments provide the words and
+                                    the current playback position.
+                                </p>
+                            </div>
+                            <div
+                                class="source-node relative border-b border-hairline py-6"
+                            >
+                                <p
+                                    class="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel"
+                                >
+                                    Comments + replies
+                                </p>
+                                <h3 class="mt-2 text-xl font-extrabold">
+                                    What the conversation adds
+                                </h3>
+                                <p class="mt-2 text-sm leading-6 text-steel">
+                                    A bounded set of loaded threads can supply
+                                    corrections, links, and creator follow-ups.
+                                </p>
+                            </div>
+                            <div class="source-node relative pt-6">
+                                <p
+                                    class="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel"
+                                >
+                                    Playback
+                                </p>
+                                <h3 class="mt-2 text-xl font-extrabold">
+                                    Where you are right now
+                                </h3>
+                                <p class="mt-2 text-sm leading-6 text-steel">
+                                    The live context rail follows the video
+                                    without repeatedly scraping the page.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="reveal self-center rounded-[28px] bg-ink p-7 text-white sm:p-10"
+                        >
+                            <div
+                                class="flex items-center justify-between gap-4"
+                            >
+                                <div class="flex items-center gap-3">
+                                    <img
+                                        src="../../assets/brand/logo.svg"
+                                        alt=""
+                                        class="h-10 w-10"
+                                    />
+                                    <div>
+                                        <p class="text-sm font-extrabold">
+                                            Ask this video
+                                        </p>
+                                        <p class="mt-0.5 text-xs text-white/50">
+                                            7 Halal Ways To Make $100 a Day in
+                                            2026
+                                        </p>
+                                    </div>
+                                </div>
+                                <span
+                                    class="font-mono text-[10px] text-white/50"
+                                    >1:03 / 16:26</span
+                                >
+                            </div>
+                            <div
+                                class="mt-5 flex items-center gap-3 text-signal"
+                            >
+                                <span
+                                    class="context-wave flex h-5 items-center gap-[3px]"
+                                    aria-hidden="true"
+                                >
+                                    <span style="height: 7px; --bar: 0"></span
+                                    ><span style="height: 16px; --bar: 1"></span
+                                    ><span style="height: 10px; --bar: 2"></span
+                                    ><span style="height: 19px; --bar: 3"></span
+                                    ><span style="height: 12px; --bar: 4"></span
+                                    ><span style="height: 6px; --bar: 5"></span
+                                    ><span
+                                        style="height: 15px; --bar: 6"
+                                    ></span>
+                                </span>
+                                <span class="relative h-px flex-1 bg-white/15"
+                                    ><span
+                                        class="absolute inset-y-0 left-0 w-[7%] bg-signal"
+                                    ></span
+                                    ><span
+                                        class="absolute left-[7%] top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal"
+                                    ></span
+                                ></span>
+                                <span
+                                    class="font-mono text-[9px] font-bold uppercase tracking-[0.12em]"
+                                    >Comments found</span
+                                >
+                            </div>
+                            <div
+                                class="mt-9 ml-auto max-w-[78%] rounded-2xl rounded-br-md bg-[#343432] px-4 py-3 text-sm leading-6"
+                            >
+                                Where is the masterclass link?
+                            </div>
+                            <div
+                                class="mt-4 max-w-[90%] rounded-2xl rounded-bl-md bg-white px-5 py-4 text-sm leading-6 text-ink"
+                            >
+                                The masterclass link is in the full video
+                                description and the creator’s reply. VidQuery
+                                preserves the complete destination instead of
+                                the shortened “http...” label.
+                            </div>
+                            <div
+                                class="mt-4 flex justify-end gap-2 font-mono text-[9px] uppercase tracking-[0.12em] text-white/40"
+                            >
+                                <span>Retry</span><span>Copy</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                id="privacy"
+                class="bg-ink px-5 py-24 text-white sm:px-8 sm:py-32 lg:px-12"
+            >
+                <div class="mx-auto max-w-[1240px]">
+                    <div
+                        class="reveal grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:gap-24"
+                    >
+                        <div>
+                            <p
+                                class="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-signal"
+                            >
+                                Private by design
+                            </p>
+                            <h2
+                                class="display-tight mt-5 text-4xl font-black leading-[0.95] sm:text-6xl"
+                            >
+                                Your key stays yours. Your question waits for
+                                you.
+                            </h2>
+                        </div>
+                        <p class="self-end text-lg leading-8 text-white/60">
+                            VidQuery has no intermediary server, account,
+                            analytics service, or persistent conversation
+                            archive. Context goes directly to Gemini only after
+                            you submit a question.
+                        </p>
+                    </div>
+
+                    <div
+                        class="reveal mt-16 grid border-y border-white/15 md:grid-cols-2"
+                    >
+                        <div class="py-9 md:pr-12">
+                            <p
+                                class="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/45"
+                            >
+                                Stays on your device
+                            </p>
+                            <ul
+                                class="mt-6 space-y-4 text-base font-semibold text-white/85"
+                            >
+                                <li>Encrypted Gemini API credential</li>
+                                <li>Up to ten recent video references</li>
+                                <li>The active conversation session</li>
+                            </ul>
+                        </div>
+                        <div
+                            class="border-t border-white/15 py-9 md:border-l md:border-t-0 md:pl-12"
+                        >
+                            <p
+                                class="font-mono text-[10px] font-bold uppercase tracking-[0.15em] text-white/45"
+                            >
+                                Sent when you ask
+                            </p>
+                            <ul
+                                class="mt-6 space-y-4 text-base font-semibold text-white/85"
+                            >
+                                <li>Your question</li>
+                                <li>The bounded video context</li>
+                                <li>Directly to Google Gemini</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="install" class="px-5 py-24 sm:px-8 sm:py-32 lg:px-12">
+                <div class="mx-auto max-w-[1240px]">
+                    <div
+                        class="reveal grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24"
+                    >
+                        <div>
+                            <p
+                                class="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-signal"
+                            >
+                                Install VidQuery
+                            </p>
+                            <h2
+                                class="display-tight mt-5 text-4xl font-black leading-[0.95] sm:text-6xl"
+                            >
+                                Three minutes from download to first question.
+                            </h2>
+                            <p class="mt-6 text-base leading-7 text-steel">
+                                VidQuery is currently distributed as a verified
+                                GitHub Release, not through the Chrome Web
+                                Store.
+                            </p>
+                            <a
+                                href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                                class="mt-8 inline-flex min-h-12 items-center rounded-xl bg-signal px-5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-signalDark"
+                                >Download v2.0.0 <span class="ml-2">↓</span></a
+                            >
+                            <a
+                                href="https://github.com/montasim/VidQuery/releases/tag/v2.0.0"
+                                class="mt-4 block text-sm font-bold text-steel underline decoration-hairline underline-offset-4 hover:text-ink"
+                                >View release and checksum ↗</a
+                            >
+                        </div>
+
+                        <ol class="border-t border-hairline">
+                            <li
+                                class="reveal grid gap-4 border-b border-hairline py-7 sm:grid-cols-[72px_1fr]"
+                            >
+                                <span
+                                    class="font-mono text-xs font-bold text-signal"
+                                    >01 / 03</span
+                                >
+                                <div>
+                                    <h3 class="text-xl font-extrabold">
+                                        Extract the release
+                                    </h3>
+                                    <p
+                                        class="mt-2 text-sm leading-6 text-steel"
+                                    >
+                                        Download the Chrome ZIP, verify it with
+                                        SHA256SUMS.txt, and extract it to a
+                                        permanent folder.
+                                    </p>
+                                </div>
+                            </li>
+                            <li
+                                class="reveal grid gap-4 border-b border-hairline py-7 sm:grid-cols-[72px_1fr]"
+                            >
+                                <span
+                                    class="font-mono text-xs font-bold text-signal"
+                                    >02 / 03</span
+                                >
+                                <div>
+                                    <h3 class="text-xl font-extrabold">
+                                        Load it in Chrome
+                                    </h3>
+                                    <p
+                                        class="mt-2 text-sm leading-6 text-steel"
+                                    >
+                                        Open chrome://extensions, enable
+                                        Developer mode, select Load unpacked,
+                                        and choose the extracted folder.
+                                    </p>
+                                </div>
+                            </li>
+                            <li
+                                class="reveal grid gap-4 border-b border-hairline py-7 sm:grid-cols-[72px_1fr]"
+                            >
+                                <span
+                                    class="font-mono text-xs font-bold text-signal"
+                                    >03 / 03</span
+                                >
+                                <div>
+                                    <h3 class="text-xl font-extrabold">
+                                        Connect Gemini
+                                    </h3>
+                                    <p
+                                        class="mt-2 text-sm leading-6 text-steel"
+                                    >
+                                        Open VidQuery, add your Gemini API key,
+                                        confirm AI processing, then ask your
+                                        first video question.
+                                    </p>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <section
+                class="border-t border-hairline bg-cloud/60 px-5 py-24 sm:px-8 lg:px-12"
+            >
+                <div class="mx-auto max-w-[920px]">
+                    <div class="reveal text-center">
+                        <h2
+                            class="display-tight text-4xl font-black sm:text-5xl"
+                        >
+                            Before you install
+                        </h2>
+                        <p class="mt-4 text-base text-steel">
+                            Straight answers about the current release.
+                        </p>
+                    </div>
+                    <div class="reveal mt-12 border-t border-hairline">
+                        <details class="group border-b border-hairline py-5">
+                            <summary
+                                class="flex cursor-pointer list-none items-center justify-between gap-5 text-left text-base font-extrabold"
+                            >
+                                <span>Does VidQuery upload a video?</span
+                                ><span
+                                    class="faq-plus text-2xl font-light text-steel transition"
+                                    >+</span
+                                >
+                            </summary>
+                            <p
+                                class="max-w-2xl pb-2 pt-4 text-sm leading-6 text-steel"
+                            >
+                                No. It extracts bounded text context from the
+                                current YouTube page and sends that context with
+                                your question directly to Gemini.
+                            </p>
+                        </details>
+                        <details class="group border-b border-hairline py-5">
+                            <summary
+                                class="flex cursor-pointer list-none items-center justify-between gap-5 text-left text-base font-extrabold"
+                            >
+                                <span>Do I need a VidQuery account?</span
+                                ><span
+                                    class="faq-plus text-2xl font-light text-steel transition"
+                                    >+</span
+                                >
+                            </summary>
+                            <p
+                                class="max-w-2xl pb-2 pt-4 text-sm leading-6 text-steel"
+                            >
+                                No. VidQuery has no account system. You bring
+                                your own Gemini API key and keep control of it
+                                in your browser profile.
+                            </p>
+                        </details>
+                        <details class="group border-b border-hairline py-5">
+                            <summary
+                                class="flex cursor-pointer list-none items-center justify-between gap-5 text-left text-base font-extrabold"
+                            >
+                                <span>Does it work on every video?</span
+                                ><span
+                                    class="faq-plus text-2xl font-light text-steel transition"
+                                    >+</span
+                                >
+                            </summary>
+                            <p
+                                class="max-w-2xl pb-2 pt-4 text-sm leading-6 text-steel"
+                            >
+                                It supports watch, Shorts, and live routes. Some
+                                sources can be unavailable when captions or
+                                comments are disabled, or when YouTube changes
+                                its rendered markup.
+                            </p>
+                        </details>
+                        <details class="group border-b border-hairline py-5">
+                            <summary
+                                class="flex cursor-pointer list-none items-center justify-between gap-5 text-left text-base font-extrabold"
+                            >
+                                <span>Will it update automatically?</span
+                                ><span
+                                    class="faq-plus text-2xl font-light text-steel transition"
+                                    >+</span
+                                >
+                            </summary>
+                            <p
+                                class="max-w-2xl pb-2 pt-4 text-sm leading-6 text-steel"
+                            >
+                                Not yet. GitHub-installed builds are manual.
+                                Download and load each newer release when it
+                                becomes available.
+                            </p>
+                        </details>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-signal px-5 py-20 text-white sm:px-8 lg:px-12">
+                <div
+                    class="reveal mx-auto flex max-w-[1240px] flex-col items-start justify-between gap-9 lg:flex-row lg:items-end"
+                >
+                    <div>
+                        <p
+                            class="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/60"
+                        >
+                            The video is still playing
+                        </p>
+                        <h2
+                            class="display-tight mt-4 max-w-3xl text-4xl font-black leading-[0.95] sm:text-6xl"
+                        >
+                            Stop scrubbing for the answer.
+                        </h2>
+                    </div>
+                    <a
+                        href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                        class="inline-flex min-h-12 shrink-0 items-center rounded-xl bg-white px-5 text-sm font-extrabold text-signal transition hover:-translate-y-0.5 hover:bg-[#f5f6f7]"
+                        >Download VidQuery <span class="ml-2">↓</span></a
+                    >
+                </div>
+            </section>
+        </main>
+
+        <footer
+            class="border-t border-hairline bg-paper px-5 py-10 sm:px-8 lg:px-12"
+        >
+            <div
+                class="mx-auto flex max-w-[1440px] flex-col gap-8 sm:flex-row sm:items-end sm:justify-between"
+            >
+                <div>
+                    <a href="#top" class="flex items-center gap-2.5">
+                        <img
+                            src="../../assets/brand/logo.svg"
+                            alt=""
+                            class="h-8 w-8"
+                        />
+                        <span class="font-extrabold tracking-[-0.035em]"
+                            >VidQuery</span
+                        >
+                    </a>
+                    <p class="mt-4 max-w-md text-sm leading-6 text-steel">
+                        A private-by-default Gemini companion for YouTube
+                        videos.
+                    </p>
+                </div>
+                <div
+                    class="flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold text-steel"
+                >
+                    <a
+                        href="https://github.com/montasim/VidQuery"
+                        class="hover:text-ink"
+                        >Source</a
+                    >
+                    <a
+                        href="https://github.com/montasim/VidQuery/releases"
+                        class="hover:text-ink"
+                        >Releases</a
+                    >
+                    <a
+                        href="https://github.com/montasim/VidQuery/issues"
+                        class="hover:text-ink"
+                        >Issues</a
+                    >
+                    <a
+                        href="https://www.supportkori.com/montasim"
+                        class="hover:text-ink"
+                        >Support</a
+                    >
+                </div>
+            </div>
+            <div
+                class="mx-auto mt-8 flex max-w-[1440px] flex-col gap-2 border-t border-hairline pt-6 font-mono text-[9px] uppercase tracking-[0.12em] text-steel sm:flex-row sm:justify-between"
+            >
+                <p>Built and maintained by Montasim</p>
+                <p>Prototype · HTML + JavaScript + Tailwind CDN</p>
+            </div>
+        </footer>
+
+        <script>
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            menuToggle.addEventListener('click', () => {
+                const open =
+                    menuToggle.getAttribute('aria-expanded') === 'true';
+                menuToggle.setAttribute('aria-expanded', String(!open));
+                menuToggle.setAttribute(
+                    'aria-label',
+                    open ? 'Open navigation' : 'Close navigation'
+                );
+                menuToggle.querySelector('span').textContent = open
+                    ? '☰'
+                    : '×';
+                mobileMenu.classList.toggle('hidden', open);
+            });
+
+            mobileMenu.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    menuToggle.setAttribute('aria-label', 'Open navigation');
+                    menuToggle.querySelector('span').textContent = '☰';
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            const demoViewport = document.getElementById('demo-viewport');
+            const demoCanvas = document.getElementById('demo-canvas');
+
+            function fitDemo() {
+                const scale = demoViewport.clientWidth / 1400;
+                demoCanvas.style.transform = `scale(${scale})`;
+                demoViewport.style.height = `${1000 * scale}px`;
+            }
+
+            new ResizeObserver(fitDemo).observe(demoViewport);
+            fitDemo();
+
+            const demoFrame = document.getElementById('product-demo');
+            const demoTabs = document.querySelectorAll('.demo-tab');
+
+            demoTabs.forEach((tab) => {
+                tab.addEventListener('click', () => {
+                    const scene = tab.dataset.scene;
+                    demoFrame.src = `../v1/index.html?embed=1&scene=${scene}${scene === 'chat' ? '&state=ready' : ''}`;
+                    demoTabs.forEach((candidate) => {
+                        const active = candidate === tab;
+                        candidate.classList.toggle('bg-ink', active);
+                        candidate.classList.toggle('text-white', active);
+                        candidate.classList.toggle('text-steel', !active);
+                    });
+                });
+            });
+
+            const reduceMotion = window.matchMedia(
+                '(prefers-reduced-motion: reduce)'
+            ).matches;
+            const reveals = document.querySelectorAll('.reveal');
+
+            if (reduceMotion) {
+                reveals.forEach((element) =>
+                    element.classList.add('is-visible')
+                );
+            } else {
+                const observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (!entry.isIntersecting) return;
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        });
+                    },
+                    { threshold: 0.14 }
+                );
+                reveals.forEach((element) => observer.observe(element));
+            }
+        </script>
+    </body>
+</html>

@@ -9,14 +9,14 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The Chrome build is written to `.output/chrome-mv3/`.
+The Chrome build is written to `apps/extension/.output/chrome-mv3/`.
 
 To test it locally:
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
-4. Choose `.output/chrome-mv3/`.
+4. Choose `apps/extension/.output/chrome-mv3/`.
 5. Open the popup, connect Gemini, then test the Side Panel on watch, Shorts, and live-video routes.
 
 ## Create the distributable archive
@@ -25,13 +25,13 @@ To test it locally:
 pnpm release:zip
 ```
 
-`release:zip` runs the complete verification suite before WXT creates a ZIP under `.output/`. Inspect the generated manifest and archive contents before distributing it.
+`release:zip` runs the complete verification suite before WXT creates a ZIP under `apps/extension/.output/`. Inspect the generated manifest and archive contents before distributing it.
 
 ## Publish a GitHub Release
 
 The tag-triggered [Release workflow](.github/workflows/release.yml) publishes the same unpacked Chrome archive pattern used by the reference extensions.
 
-1. Update the version in `package.json` and ensure the lockfile is current.
+1. Update the version in `apps/extension/package.json` and ensure the root lockfile is current.
 2. Update [.github/RELEASE_NOTES.md](.github/RELEASE_NOTES.md) for that version.
 3. Run `pnpm check` locally.
 4. Commit and merge the release-ready changes.
@@ -42,9 +42,10 @@ The tag-triggered [Release workflow](.github/workflows/release.yml) publishes th
     git push origin v2.0.0
     ```
 
-The workflow rejects a tag that does not equal `v` plus the version in `package.json`. A successful run publishes:
+The workflow rejects a tag that does not equal `v` plus the version in `apps/extension/package.json`. A successful run publishes:
 
 - `VidQuery-vX.Y.Z-chrome-unpacked.zip`;
+- `VidQuery-chrome-unpacked.zip`, the stable landing-page download target;
 - `SHA256SUMS.txt`; and
 - the curated release notes from `.github/RELEASE_NOTES.md`.
 
@@ -52,9 +53,9 @@ The archive is validated before publication to ensure `manifest.json` is at its 
 
 ## Release checklist
 
-- Confirm `package.json` contains the intended extension version.
+- Confirm `apps/extension/package.json` contains the intended extension version.
 - Run `pnpm check` from a clean checkout with the committed pnpm lockfile.
-- Load `.output/chrome-mv3/` into the minimum supported Chrome version.
+- Load `apps/extension/.output/chrome-mv3/` into the minimum supported Chrome version.
 - Verify first-time consent, validated and unvalidated key saves, key removal, and legacy-key migration.
 - Verify watch, Shorts, live, unsupported-page, transcript-available, and transcript-unavailable states.
 - Verify question submission, Markdown rendering, edit, retry, quota, invalid-key, and offline errors.
