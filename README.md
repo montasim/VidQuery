@@ -2,14 +2,14 @@
 
 > Ask Gemini questions grounded in the YouTube video you are watching, from a focused Chrome Side Panel.
 
-[![CI](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml)
+[![CI](https://github.com/montasim/VidQuery/actions/workflows/ci.yml/badge.svg)](https://github.com/montasim/VidQuery/actions/workflows/ci.yml)
 [![Support on SupportKori](https://img.shields.io/badge/Support_on-SupportKori-00B8B5)](https://www.supportkori.com/montasim)
 
 VidQuery is a Chromium extension for people who want to question a video without moving its transcript and metadata into a separate chat tool. Open a YouTube watch, Shorts, or live-video page; the extension collects a bounded Video Context locally and sends it directly to Google Gemini only after you submit a question.
 
 The V2 extension uses a Chrome Side Panel for conversations and a compact toolbar popup for consent and Gemini connection setup. It has no intermediary backend, account, analytics service, or persistent conversation archive.
 
-**[Browse releases](https://github.com/montasim/youtube-helper/releases) · [Preview the approved interface](prototypes/v1/index.html) · [Report an issue](https://github.com/montasim/youtube-helper/issues)**
+**[Browse releases](https://github.com/montasim/VidQuery/releases) · [Preview the approved interface](prototypes/v1/index.html) · [Report an issue](https://github.com/montasim/VidQuery/issues)**
 
 ## What it does
 
@@ -28,7 +28,7 @@ The V2 extension uses a Chrome Side Panel for conversations and a compact toolba
 
 Once a release has been published by the tag workflow:
 
-1. Open [GitHub Releases](https://github.com/montasim/youtube-helper/releases).
+1. Open [GitHub Releases](https://github.com/montasim/VidQuery/releases).
 2. Download `VidQuery-vX.Y.Z-chrome-unpacked.zip` and `SHA256SUMS.txt`.
 3. Place both files in the same folder and verify the download:
 
@@ -54,19 +54,19 @@ GitHub-installed builds do not update automatically. Repeat this process for eac
 ### Build and load
 
 ```bash
-git clone https://github.com/montasim/youtube-helper.git
-cd youtube-helper
+git clone https://github.com/montasim/VidQuery.git
+cd VidQuery
 pnpm install
-pnpm build
+pnpm build:extension
 ```
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
-4. Choose `.output/chrome-mv3/` from this repository.
+4. Choose `apps/extension/.output/chrome-mv3/` from this repository.
 5. Pin VidQuery to the browser toolbar if desired.
 
-For an installable archive, run `pnpm zip`; WXT writes the packaged extension under `.output/`.
+For an installable archive, run `pnpm release:zip`; WXT writes the packaged extension under `apps/extension/.output/`.
 
 ## First use
 
@@ -121,6 +121,7 @@ flowchart LR
 | Session credential cache | Restricted `chrome.storage.session`                          |
 | Device encryption key    | Non-exportable Web Crypto key in IndexedDB                   |
 | Tests                    | Vitest, Testing Library, Happy DOM, fake-indexeddb           |
+| Product website          | TanStack Start, shadcn, Tailwind CSS 4, Netlify              |
 
 The project’s domain language is in [CONTEXT.md](CONTEXT.md). Architectural trade-offs are recorded under [docs/adr](docs/adr).
 
@@ -128,34 +129,30 @@ The project’s domain language is in [CONTEXT.md](CONTEXT.md). Architectural tr
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev:extension
 ```
 
 WXT prints the development output path. Load that unpacked directory in Chrome, keep a YouTube video open, and reload the extension after permission or manifest changes.
 
-| Command             | Purpose                                                |
-| ------------------- | ------------------------------------------------------ |
-| `pnpm dev`          | Start WXT development mode                             |
-| `pnpm build`        | Build the Chrome Manifest V3 extension                 |
-| `pnpm zip`          | Build and package the extension                        |
-| `pnpm release:zip`  | Run the full quality gate and package the extension    |
-| `pnpm typecheck`    | Check TypeScript without emitting files                |
-| `pnpm lint`         | Run ESLint with zero warnings allowed                  |
-| `pnpm format:check` | Verify Prettier formatting                             |
-| `pnpm test`         | Run the Vitest suite once                              |
-| `pnpm check`        | Run formatting, linting, type checks, tests, and build |
+| Command                | Purpose                                                 |
+| ---------------------- | ------------------------------------------------------- |
+| `pnpm dev:extension`   | Start WXT extension development                         |
+| `pnpm dev:web`         | Start the TanStack Start landing page                   |
+| `pnpm build:extension` | Build the Chrome Manifest V3 extension                  |
+| `pnpm build:web`       | Build the Netlify-ready website                         |
+| `pnpm release:zip`     | Validate and package the extension                      |
+| `pnpm check:extension` | Run extension formatting, lint, types, tests, and build |
+| `pnpm check:web`       | Run website formatting, lint, types, and Netlify build  |
+| `pnpm check`           | Run the complete workspace quality gate                 |
 
 ## Project structure
 
 ```text
-entrypoints/             WXT background, content-script, popup, and Side Panel entry points
-src/application/         Application errors and orchestration boundaries
-src/domain/              Validated Video Context and retained-data schemas
-src/infrastructure/      Gemini adapter and browser storage implementations
-src/shared/              Typed browser protocol and shared utilities
-src/ui/                  Tailwind/shadcn components and React surfaces
-tests/                   Credential, storage, prompt, and UI verification
-prototypes/v1/           Standalone approved interface reference
+apps/extension/          WXT extension source, tests, and package configuration
+apps/web/                TanStack Start, shadcn, Tailwind, and Netlify website
+assets/brand/            Canonical VidQuery brand assets
+prototypes/v1/           Standalone approved extension interface reference
+prototypes/landing/      Original static landing-page reference
 docs/adr/                Accepted architecture decisions
 ```
 
@@ -171,13 +168,13 @@ docs/adr/                Accepted architecture decisions
 
 ## Automated releases
 
-Pushing a version tag such as `v2.0.0` runs the [Release workflow](.github/workflows/release.yml). The tag must match `package.json`. The workflow installs the locked dependency graph, runs the complete quality gate, builds the WXT archive, verifies that `manifest.json` is at its root, generates a SHA-256 checksum, and creates a GitHub Release containing both files.
+Pushing a version tag such as `v2.0.0` runs the [Release workflow](.github/workflows/release.yml). The tag must match `apps/extension/package.json`. The workflow installs the locked dependency graph, runs the complete quality gate, builds the WXT archive, verifies that `manifest.json` is at its root, generates SHA-256 checksums, and creates a GitHub Release with versioned and stable download filenames.
 
 Release descriptions come from [.github/RELEASE_NOTES.md](.github/RELEASE_NOTES.md) and should be updated before tagging. See [DEPLOYMENT.md](DEPLOYMENT.md) for the maintainer checklist and exact release procedure. The repository does not publish this extension to npm or submit it automatically to the Chrome Web Store.
 
 ## Support and security
 
-Use [GitHub Issues](https://github.com/montasim/youtube-helper/issues) for reproducible bugs and feature requests. Include the browser version, YouTube route type, whether a transcript was available, and the visible error message. Never include an API key, transcript, private question, or full Gemini request in an issue.
+Use [GitHub Issues](https://github.com/montasim/VidQuery/issues) for reproducible bugs and feature requests. Include the browser version, YouTube route type, whether a transcript was available, and the visible error message. Never include an API key, transcript, private question, or full Gemini request in an issue.
 
 Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
 

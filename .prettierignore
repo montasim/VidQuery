@@ -75,6 +75,12 @@
 .out/
 .output/
 .wxt/
+**/.output/
+**/.wxt/
+**/.netlify/
+**/dist/
+apps/web/public/prototypes/
+apps/web/src/routeTree.gen.ts
 
 
 ####################################################

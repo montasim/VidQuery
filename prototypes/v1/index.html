@@ -87,6 +87,16 @@
                 animation: surface-enter 220ms cubic-bezier(0.16, 1, 0.3, 1)
                     both;
             }
+            body.is-embedded > header {
+                display: none;
+            }
+            body.is-embedded .scene > div {
+                min-height: 100vh !important;
+            }
+            body.is-embedded [data-chat-root] > div {
+                top: 0;
+                height: 100vh;
+            }
             .state-only {
                 display: none;
             }
@@ -1306,6 +1316,10 @@
 
         <script>
             const params = new URLSearchParams(window.location.search);
+            document.body.classList.toggle(
+                'is-embedded',
+                params.get('embed') === '1'
+            );
             let currentScene = [
                 'chat',
                 'history',
