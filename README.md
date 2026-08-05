@@ -1,138 +1,198 @@
-# YouTube Video Chat Assistant
+# VidQuery
 
-> A Chromium extension that brings Gemini-powered questions and answers into YouTube watch, Shorts, and live-video pages.
+> Ask Gemini questions grounded in the YouTube video you are watching, from a focused Chrome Side Panel.
 
+[![CI](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/montasim/youtube-helper/actions/workflows/ci.yml)
 [![Support on SupportKori](https://img.shields.io/badge/Support_on-SupportKori-00B8B5)](https://www.supportkori.com/montasim)
-[![Build, Test, and Publish](https://github.com/montasim/youtube-helper/actions/workflows/publish.yml/badge.svg)](https://github.com/montasim/youtube-helper/actions/workflows/publish.yml)
 
-The extension gathers the current video’s visible metadata and transcript when available, injects a chat panel into YouTube, and sends the resulting context plus each question directly to Google’s Gemini 2.5 Flash API using the user’s own key.
+VidQuery is a Chromium extension for people who want to question a video without moving its transcript and metadata into a separate chat tool. Open a YouTube watch, Shorts, or live-video page; the extension collects a bounded Video Context locally and sends it directly to Google Gemini only after you submit a question.
 
-**[Report an issue](https://github.com/montasim/youtube-helper/issues) · [Get a Gemini API key](https://aistudio.google.com/app/apikey)**
+The V2 extension uses a Chrome Side Panel for conversations and a compact toolbar popup for consent and Gemini connection setup. It has no intermediary backend, account, analytics service, or persistent conversation archive.
 
-## Features
+**[Browse releases](https://github.com/montasim/youtube-helper/releases) · [Preview the approved interface](prototypes/v1/index.html) · [Report an issue](https://github.com/montasim/youtube-helper/issues)**
 
-- Embedded chat on YouTube watch, Shorts, and live pages
-- Video title, channel, description, duration, playback time, URL, and transcript context
-- Gemini 2.5 Flash responses with the user’s own API key
-- API-key validation from the extension popup
-- Recent-video history for up to ten videos
-- Single-page navigation detection when the current YouTube video changes
-- Manifest V3 extension build and ZIP packaging commands
+## What it does
 
-## Privacy at a glance
+- Opens a dedicated conversation workspace in Chrome’s Side Panel.
+- Adds an **Ask this video** launcher to supported YouTube pages.
+- Grounds questions in the current video title, channel, full description and links, URL, duration, playback position, available transcript, comments, and replies.
+- Supports YouTube watch, Shorts, and live-video routes, including single-page navigation between videos.
+- Shows whether transcript context is available before a question is sent.
+- Renders structured Gemini answers, including lists, links, and code.
+- Lets a person edit and resend a question or retry a failed answer.
+- Retains up to ten Recent Videos for navigation without saving their transcripts or conversations.
+- Keeps the Gemini key in a device-bound encrypted credential vault.
+- Migrates the legacy synced key and YouTube-origin recent-video list when safe to do so.
 
-The Gemini key is stored with `chrome.storage.sync`, which can synchronize through the signed-in browser profile. Recent video history is stored in YouTube-origin `localStorage`. When you chat, video metadata, any extracted transcript, the video URL, current playback time, and your question are sent to Google’s Generative Language API. Review Google’s data terms before using confidential or private material.
+## Install from a GitHub Release
 
-This project does not operate an intermediary backend.
+Once a release has been published by the tag workflow:
+
+1. Open [GitHub Releases](https://github.com/montasim/youtube-helper/releases).
+2. Download `VidQuery-vX.Y.Z-chrome-unpacked.zip` and `SHA256SUMS.txt`.
+3. Place both files in the same folder and verify the download:
+
+    ```bash
+    sha256sum --check SHA256SUMS.txt
+    ```
+
+4. Extract the ZIP to a permanent folder.
+5. Open `chrome://extensions`, enable **Developer mode**, and select **Load unpacked**.
+6. Choose the extracted folder containing `manifest.json`.
+
+GitHub-installed builds do not update automatically. Repeat this process for each newer release, and keep the extracted folder in place while Chrome uses the extension.
 
 ## Install from source
 
 ### Requirements
 
-- Node.js 20.19.3 (see `.node-version`)
-- npm (the repository commits `package-lock.json`)
-- Chrome or another Chromium browser
-- A Gemini API key with Generative Language API access
-
-Although `package.json` declares pnpm 10+, the scripts call `npm` internally and only `package-lock.json` is committed. The documented development path therefore uses npm.
+- Node.js 20.19.3 or newer
+- pnpm 10.10.0 or compatible
+- Chrome 141 or newer, required for the in-panel close control
+- A Gemini API key from [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### Build and load
 
 ```bash
 git clone https://github.com/montasim/youtube-helper.git
 cd youtube-helper
-npm install
-npm run build:extension
+pnpm install
+pnpm build
 ```
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
-4. Choose `extension-dist/`.
-5. Open the extension popup, enter your Gemini key, and save it.
-6. Visit a supported YouTube video page and open the injected chat.
+4. Choose `.output/chrome-mv3/` from this repository.
+5. Pin VidQuery to the browser toolbar if desired.
 
-For a distributable archive, run `npm run package:extension`; it creates `youtube-video-chat-extension.zip`.
+For an installable archive, run `pnpm zip`; WXT writes the packaged extension under `.output/`.
 
-## How it works
+## First use
+
+1. Select the VidQuery toolbar icon.
+2. Paste your Gemini API key.
+3. Read and confirm the AI-processing disclosure.
+4. Select **Save and validate**. **Save without validation** is available when validation cannot be completed, but the first real question may still fail if the key or model access is invalid.
+5. Open a supported YouTube video.
+6. Select the floating **Ask this video** button, or reopen the popup and select **Open assistant**.
+7. Ask a question in the Side Panel.
+
+Nothing is sent to Gemini merely because the panel is open. The Video Context and question are sent only when the person asks.
+
+## Privacy and credential storage
+
+The Gemini key is encrypted with AES-GCM before persistent storage. A non-exportable, device-bound encryption key is kept in IndexedDB; `chrome.storage.local` receives only versioned ciphertext and an initialization vector. Decrypted credentials are cached in `chrome.storage.session` for the active browser session, and both storage areas are restricted to trusted extension contexts.
+
+This design protects the key from casual plaintext inspection and from direct content-script access. It is not an operating-system credential manager and cannot protect a key from a malicious or compromised extension process. Remove or rotate the key if the browser profile or device may be compromised.
+
+When a question is submitted, the following can be sent directly to Google’s Gemini API:
+
+- video title and channel;
+- description and URL;
+- duration and current playback position;
+- available transcript text;
+- loaded comments and replies; and
+- the person’s question.
+
+No project-operated backend receives this data. Google controls Gemini availability, quotas, retention, and data handling. Google states that free-tier content may be used to improve its products; review the [Gemini API pricing and data-use table](https://ai.google.dev/gemini-api/docs/pricing) and [Gemini API terms](https://ai.google.dev/gemini-api/terms) before sending sensitive material.
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    A[YouTube DOM] --> B[content.js]
-    B --> C[Video context + question]
-    C --> D[background.js]
-    E[Gemini key in chrome.storage.sync] --> D
-    D --> F[Google Gemini API]
-    F --> D
-    D --> B
-    B --> G[Injected chat UI]
+    A[YouTube content script] -->|bounded Video Context| B[WXT background worker]
+    C[React Side Panel] -->|typed request| B
+    D[React popup] -->|consent and encrypted credential operations| B
+    B --> E[Device-bound credential vault]
+    B -->|question and Video Context| F[Google Gemini API]
+    F --> B
+    B --> C
+    B --> G[Local Recent Videos]
 ```
 
-`content.js` observes YouTube’s dynamic page, extracts context, maintains recent history, and renders chat. `background.js` owns Gemini requests. `popup.js` stores and optionally validates the API key.
+| Area                     | Implementation                                               |
+| ------------------------ | ------------------------------------------------------------ |
+| Extension framework      | WXT with Manifest V3                                         |
+| Interface                | React 19, Tailwind CSS 4, shadcn-compatible Radix primitives |
+| Language and validation  | TypeScript and Zod                                           |
+| AI provider              | Gemini Developer API, direct BYOK access                     |
+| Persistent state         | Restricted `chrome.storage.local`                            |
+| Session credential cache | Restricted `chrome.storage.session`                          |
+| Device encryption key    | Non-exportable Web Crypto key in IndexedDB                   |
+| Tests                    | Vitest, Testing Library, Happy DOM, fake-indexeddb           |
 
-## Gemini request behavior
+The project’s domain language is in [CONTEXT.md](CONTEXT.md). Architectural trade-offs are recorded under [docs/adr](docs/adr).
 
-| Setting | Value |
-| --- | --- |
-| Endpoint | Generative Language API `v1beta` |
-| Model | `gemini-2.5-flash` |
-| Chat temperature | `0.7` |
-| Top K / Top P | `40` / `0.95` |
-| Maximum output tokens | `1024` |
+## Development
 
-Model availability, quotas, pricing, and API behavior are controlled by Google and may change independently of this extension.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Permissions
+WXT prints the development output path. Load that unpacked directory in Chrome, keep a YouTube video open, and reload the extension after permission or manifest changes.
 
-| Permission/scope | Purpose |
-| --- | --- |
-| `activeTab` | Interact with the current supported YouTube tab |
-| `storage` | Store the Gemini API key in browser sync storage |
-| YouTube host access | Inject the chat and read page/video context |
-| Google Generative Language host access | Validate the key and send chat requests |
+| Command             | Purpose                                                |
+| ------------------- | ------------------------------------------------------ |
+| `pnpm dev`          | Start WXT development mode                             |
+| `pnpm build`        | Build the Chrome Manifest V3 extension                 |
+| `pnpm zip`          | Build and package the extension                        |
+| `pnpm release:zip`  | Run the full quality gate and package the extension    |
+| `pnpm typecheck`    | Check TypeScript without emitting files                |
+| `pnpm lint`         | Run ESLint with zero warnings allowed                  |
+| `pnpm format:check` | Verify Prettier formatting                             |
+| `pnpm test`         | Run the Vitest suite once                              |
+| `pnpm check`        | Run formatting, linting, type checks, tests, and build |
 
-## Commands
+## Project structure
 
-| Command | Purpose |
-| --- | --- |
-| `npm run build:extension` | Copy extension assets into `extension-dist/` |
-| `npm run package:extension` | Build and ZIP the extension |
-| `npm run dev:extension` | Build and print unpacked-install guidance |
-| `npm run build` | Build the small TypeScript package entry into `dist/` |
-| `npm test` | Run Jest |
-| `npm run lint:check` | Check ESLint and Prettier |
+```text
+entrypoints/             WXT background, content-script, popup, and Side Panel entry points
+src/application/         Application errors and orchestration boundaries
+src/domain/              Validated Video Context and retained-data schemas
+src/infrastructure/      Gemini adapter and browser storage implementations
+src/shared/              Typed browser protocol and shared utilities
+src/ui/                  Tailwind/shadcn components and React surfaces
+tests/                   Credential, storage, prompt, and UI verification
+prototypes/v1/           Standalone approved interface reference
+docs/adr/                Accepted architecture decisions
+```
 
-The TypeScript package entry currently exports only a boilerplate welcome function and is not the runtime extension implementation.
+## Current limitations
 
-## Important limitations
+- Description, transcript, comment, and reply extraction depends on YouTube’s current rendered controls and markup. VidQuery loads a bounded set of comments and replies when possible; disabled comments, unavailable captions, or future YouTube DOM changes can leave some sources unavailable.
+- The complete extracted transcript is sent in one Gemini request. Very long transcripts may exceed provider limits.
+- Gemini responses can be incomplete or inaccurate. Verify important claims against the video and primary sources.
+- Free-tier availability, model access, quotas, and data use are controlled by Google and may change independently of this extension.
+- Conversations exist only in the active Side Panel document and are intentionally not restored after that session closes.
+- Only Chromium installation is documented. There is no verified Chrome Web Store listing in this repository.
+- The repository has no `LICENSE` file. Source visibility does not grant permission to copy, modify, or redistribute it.
 
-- Transcript extraction depends on YouTube’s current DOM and transcript availability; disabled captions, language differences, or markup changes can prevent it.
-- The extension sends the complete extracted transcript in one prompt and does not chunk long videos, so model input limits may truncate or reject requests.
-- AI answers can be incomplete or inaccurate; confirm important claims against the video or primary sources.
-- Browser sync storage is convenient, not a dedicated secrets vault. Restrict and rotate exposed API keys.
-- Only Chromium installation is documented and the extension is not linked to a browser-store listing.
-- The repository has license metadata and a Creative Commons statement but no `LICENSE` file containing the license text.
-- The publish workflow runs formatting fixes, versions/tags, and npm publishing on every push to `main`; maintainers should review that release design before enabling it with credentials.
+## Automated releases
 
-## Troubleshooting
+Pushing a version tag such as `v2.0.0` runs the [Release workflow](.github/workflows/release.yml). The tag must match `package.json`. The workflow installs the locked dependency graph, runs the complete quality gate, builds the WXT archive, verifies that `manifest.json` is at its root, generates a SHA-256 checksum, and creates a GitHub Release containing both files.
 
-- **No chat button:** confirm the URL is a watch, Shorts, or live page, then reload the extension and tab.
-- **No transcript:** open a video with captions and retry; extraction cannot manufacture a transcript.
-- **API failure:** validate the key in the popup and check Google quota, permissions, network access, and browser console logs.
-- **Old context after navigation:** refresh the page and report the source and destination video URLs if it reproduces.
+Release descriptions come from [.github/RELEASE_NOTES.md](.github/RELEASE_NOTES.md) and should be updated before tagging. See [DEPLOYMENT.md](DEPLOYMENT.md) for the maintainer checklist and exact release procedure. The repository does not publish this extension to npm or submit it automatically to the Chrome Web Store.
 
-## Contributing and security
+## Support and security
 
-Run `npm run lint:check`, `npm test`, and `npm run build:extension` before a pull request. Do not commit API keys or include them in screenshots/logs. Follow [SECURITY.md](SECURITY.md) for private vulnerability reporting.
+Use [GitHub Issues](https://github.com/montasim/youtube-helper/issues) for reproducible bugs and feature requests. Include the browser version, YouTube route type, whether a transcript was available, and the visible error message. Never include an API key, transcript, private question, or full Gemini request in an issue.
+
+Report vulnerabilities privately using [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+Issues and pull requests are welcome. Keep changes aligned with the accepted ADRs and immutable prototype workflow. Run `pnpm check` before opening a pull request, and do not include build output, browser-profile data, API keys, or captured private transcripts.
 
 ## Funding
 
-Support continued development through [SupportKori](https://www.supportkori.com/montasim).
-
-## License
-
-The project metadata declares [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/), which permits sharing with attribution but prohibits commercial use and distribution of derivatives. A local license file is currently missing; add one before relying on the repository as the authoritative license grant.
+Optional support helps maintain compatibility with YouTube and Gemini changes: [support the project on SupportKori](https://www.supportkori.com/montasim). Bug reports, tests, and documentation improvements are equally useful.
 
 ## Author
 
-Created by [Montasim](https://github.com/montasim).
+Built and maintained by [Montasim](https://github.com/montasim).
+
+## License status
+
+No license text is currently included. Until a `LICENSE` file is added, no open-source license grant should be inferred from package metadata or earlier releases.

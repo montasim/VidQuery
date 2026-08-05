@@ -1,96 +1,63 @@
 {
-  "name": "youtube-video-chat-extension",
-  "version": "1.1.1",
-  "description": "A Chromium browser extension that enables AI-powered conversations about YouTube videos using Google's Gemini API.",
+  "name": "vidquery",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A private-by-default Gemini companion for YouTube videos.",
+  "packageManager": "pnpm@10.10.0",
   "engines": {
-    "node": ">=20.x",
-    "pnpm": ">=10.x"
+    "node": ">=20.19.3"
   },
-  "main": "./extension-dist/manifest.json",
-  "module": "./extension-dist/content.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    "extension": "./extension-dist/",
-    "package": "./youtube-video-chat-extension.zip"
-  },
-  "files": [
-    "extension-dist",
-    "youtube-video-chat-extension.zip",
-    "README.md",
-    "DEPLOYMENT.md"
-  ],
   "scripts": {
-    "build": "rimraf dist && tsup src/index.ts --dts --format esm,cjs --out-dir dist",
-    "build:extension": "rimraf extension-dist && node scripts/build-extension.js",
-    "package:extension": "npm run build:extension && cd extension-dist && zip -r ../youtube-video-chat-extension.zip .",
-    "dev:extension": "npm run build:extension && echo 'Extension built! Load extension-dist/ folder in Chrome'",
-    "install:chrome": "npm run build:extension && echo 'Go to chrome://extensions/ and load the extension-dist/ folder'",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "eslint:check": "eslint .",
-    "eslint:fix": "eslint . --fix",
-    "prettier:check": "prettier . --check",
-    "prettier:fix": "prettier . --write",
-    "lint:check": "eslint . && prettier . --check",
-    "lint:fix": "eslint . --fix && prettier . --write",
-    "prepare": "husky",
-    "commitlint": "commitlint --edit",
-    "release": "HUSKY_SKIP_HOOKS=1 standard-version && git push --follow-tags",
-    "release:minor": "standard-version --release-as minor && git push --follow-tags",
-    "release:major": "standard-version --release-as major && git push --follow-tags",
-    "release:patch": "standard-version --release-as patch && git push --follow-tags"
+    "dev": "wxt",
+    "prepare": "wxt prepare && husky",
+    "build": "wxt build",
+    "zip": "wxt zip",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "release:zip": "pnpm check && wxt zip"
   },
-  "keywords": [
-    "chrome-extension",
-    "youtube",
-    "ai-chat",
-    "gemini-api",
-    "video-analysis",
-    "browser-extension",
-    "chromium",
-    "artificial-intelligence",
-    "video-chat",
-    "content-analysis"
-  ],
-  "author": {
-    "name": "Mohammad Montasim -Al- Mamun Shuvo",
-    "portfolio": "https://montasim-dev.web.app/",
-    "contact": {
-      "email": "montasimmamun@gmail.com",
-      "mobile": "+8801722815469"
-    },
-    "social": {
-      "linkedIn": "https://www.linkedin.com/in/montasim",
-      "gitHub": "https://github.com/montasim"
-    }
-  },
-  "license": "CC BY-NC-ND 4.0",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/montasim/youtube-helper.git"
-  },
-  "bugs": {
-    "url": "https://github.com/montasim/youtube-helper/issues"
-  },
-  "homepage": "https://github.com/montasim/youtube-helper",
-  "publishConfig": {
-    "access": "public"
+  "dependencies": {
+    "@fontsource-variable/instrument-sans": "^5.2.8",
+    "@fontsource-variable/manrope": "^5.2.8",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.544.0",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
-    "@types/jest": "^30.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.38.0",
-    "@typescript-eslint/parser": "^8.38.0",
-    "commitlint": "^19.8.1",
-    "eslint": "^9.31.0",
-    "globals": "^16.3.0",
+    "@eslint/js": "^9.39.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/chrome": "^0.1.32",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitest/coverage-v8": "^4.0.8",
+    "@wxt-dev/module-react": "^1.2.0",
+    "eslint": "^9.39.0",
+    "fake-indexeddb": "^6.2.4",
+    "globals": "^16.5.0",
+    "happy-dom": "^20.0.10",
     "husky": "^9.1.7",
-    "jest": "^30.0.5",
     "prettier": "^3.6.2",
-    "rimraf": "^6.0.1",
-    "standard-version": "^9.5.0",
-    "ts-jest": "^29.4.0",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "tailwindcss": "^4.1.17",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "vitest": "^4.0.8",
+    "wxt": "^0.20.11"
   }
 }
