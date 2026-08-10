@@ -19,13 +19,13 @@ export function SupportLink({ compact = false }: { compact?: boolean }) {
                 href={SUPPORT_URL}
                 target="_blank"
                 rel="noreferrer"
-                aria-label="Support this project"
+                aria-label="Support"
             >
                 <Heart
                     className="h-4 w-4"
                     fill={compact ? 'currentColor' : 'none'}
                 />
-                {compact ? null : 'Support on SupportKori'}
+                {compact ? null : 'Support'}
             </a>
         </Button>
     );

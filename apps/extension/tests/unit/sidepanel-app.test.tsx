@@ -91,9 +91,10 @@ describe('Side Panel entry states', () => {
     it('offers the external SupportKori action without embedding it', () => {
         render(<SidePanelApp />);
 
-        expect(
-            screen.getByRole('link', { name: 'Support this project' })
-        ).toHaveAttribute('href', 'https://www.supportkori.com/montasim');
+        expect(screen.getByRole('link', { name: 'Support' })).toHaveAttribute(
+            'href',
+            'https://www.supportkori.com/montasim'
+        );
     });
 
     it('right-aligns message actions and supports copy and answer retry', async () => {

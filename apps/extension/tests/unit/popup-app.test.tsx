@@ -51,11 +51,11 @@ describe('popup connection workflow', () => {
         expect(await screen.findByText('Gemini is connected')).toBeVisible();
     });
 
-    it('shows the SupportKori action in the popup footer', async () => {
+    it('shows the Support action in the popup header', async () => {
         render(<PopupApp />);
 
         expect(
-            await screen.findByRole('link', { name: 'Support this project' })
+            await screen.findByRole('link', { name: 'Support' })
         ).toHaveAttribute('href', 'https://www.supportkori.com/montasim');
     });
 });

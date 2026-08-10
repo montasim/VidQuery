@@ -6,6 +6,7 @@ const youtubeOrigins = ['https://www.youtube.com/*', 'https://youtube.com/*'];
 export default defineConfig({
     modules: ['@wxt-dev/module-react'],
     publicDir: 'icons',
+    outDirTemplate: '.',
     vite: () => ({ plugins: [tailwindcss()] }),
     manifest: {
         name: 'VidQuery',

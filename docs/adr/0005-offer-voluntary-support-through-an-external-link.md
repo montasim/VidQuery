@@ -4,7 +4,7 @@ status: accepted
 
 # Offer voluntary project support through an external SupportKori link
 
-Expose an optional **Support this project** action in the Side Panel header and a labeled **Support on SupportKori** action in the popup footer. Both actions open Montasim’s SupportKori page in a new browser tab.
+Expose an optional **Support** action in the Side Panel and popup headers. Both actions open Montasim’s SupportKori page in a new browser tab.
 
 ## Considered options
 
