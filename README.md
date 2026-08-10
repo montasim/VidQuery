@@ -63,7 +63,7 @@ pnpm build:extension
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
-4. Choose `apps/extension/.output/chrome-mv3/` from this repository.
+4. Choose `apps/extension/.output/` from this repository.
 5. Pin VidQuery to the browser toolbar if desired.
 
 For an installable archive, run `pnpm release:zip`; WXT writes the packaged extension under `apps/extension/.output/`.

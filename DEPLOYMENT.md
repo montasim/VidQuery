@@ -9,14 +9,14 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The Chrome build is written to `apps/extension/.output/chrome-mv3/`.
+The Chrome build is written directly to `apps/extension/.output/`.
 
 To test it locally:
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode**.
 3. Select **Load unpacked**.
-4. Choose `apps/extension/.output/chrome-mv3/`.
+4. Choose `apps/extension/.output/`.
 5. Open the popup, connect Gemini, then test the Side Panel on watch, Shorts, and live-video routes.
 
 ## Create the distributable archive
@@ -55,7 +55,7 @@ The archive is validated before publication to ensure `manifest.json` is at its 
 
 - Confirm `apps/extension/package.json` contains the intended extension version.
 - Run `pnpm check` from a clean checkout with the committed pnpm lockfile.
-- Load `apps/extension/.output/chrome-mv3/` into the minimum supported Chrome version.
+- Load `apps/extension/.output/` into the minimum supported Chrome version.
 - Verify first-time consent, validated and unvalidated key saves, key removal, and legacy-key migration.
 - Verify watch, Shorts, live, unsupported-page, transcript-available, and transcript-unavailable states.
 - Verify question submission, Markdown rendering, edit, retry, quota, invalid-key, and offline errors.

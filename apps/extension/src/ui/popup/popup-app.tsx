@@ -105,7 +105,10 @@ export function PopupApp() {
     return (
         <main className="w-[380px] bg-paper text-graphite">
             <header className="border-b border-line px-6 pb-5 pt-6">
-                <Brand />
+                <div className="flex items-center justify-between gap-4">
+                    <Brand />
+                    <SupportLink />
+                </div>
                 <p className="mt-4 text-[12px] leading-relaxed text-smoke">
                     Connect your own Gemini key, then ask questions grounded in
                     the video you are watching.
@@ -276,15 +279,14 @@ export function PopupApp() {
                     {message.text}
                 </div>
             ) : null}
-            <footer className="flex items-center gap-4 border-t border-line bg-porcelain px-6 py-4">
-                <p className="min-w-0 flex-1 text-[10px] leading-relaxed text-smoke">
+            <footer className="border-t border-line bg-porcelain px-6 py-4">
+                <p className="text-[10px] leading-relaxed text-smoke">
                     <strong className="text-graphite">
                         Private by design.
                     </strong>{' '}
                     No intermediary server, account, or saved conversation
                     history.
                 </p>
-                <SupportLink />
             </footer>
         </main>
     );
