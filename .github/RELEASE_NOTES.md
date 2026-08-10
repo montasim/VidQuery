@@ -1,12 +1,9 @@
-## What’s new in v2.0.0
+## What’s new in v2.1.0
 
-- Rebuilt VidQuery with WXT, React, TypeScript, Tailwind CSS, and shadcn-compatible Radix primitives.
-- Moved video conversations into Chrome’s Side Panel while keeping a focused toolbar popup for Gemini setup and connection status.
-- Added explicit AI-processing consent and direct bring-your-own-key access to Gemini’s eligible free tier.
-- Added a device-bound AES-GCM credential vault with encrypted persistent storage, a session-only plaintext cache, trusted-context restrictions, and safe legacy-key migration.
-- Preserved YouTube watch, Shorts, live-video, single-page navigation, transcript context, message editing, answer retry, and ten-item Recent Videos behavior.
-- Added typed browser protocols, validated local data, actionable provider errors, Markdown answers, and unsupported-page states.
-- Replaced the npm publishing workflow with extension-specific CI, build, test, ZIP, checksum, and GitHub Release automation.
+- Moved the popup Support action into the header so it stays visible alongside the VidQuery brand.
+- Shortened the action label to **Support** while keeping the same external SupportKori destination and privacy boundary.
+- Simplified local installation by writing unpacked extension files directly to `apps/extension/.output/`.
+- Updated automated tests and installation documentation for the refined header and flattened build output.
 
 ## Install in Chrome
 
