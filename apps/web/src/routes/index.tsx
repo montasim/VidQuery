@@ -412,7 +412,7 @@ function Home() {
                         </div>
                         <Button
                             asChild
-                            className="h-12 shrink-0 rounded-xl bg-white px-5 font-extrabold text-signal hover:bg-ink hover:text-white"
+                            className="h-12 shrink-0 rounded-xl bg-white px-5 font-extrabold !text-signal hover:bg-ink hover:!text-white"
                         >
                             <a href={downloadUrl}>Download for Chrome</a>
                         </Button>
