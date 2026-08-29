@@ -54,7 +54,7 @@ export function ProductDemo() {
                     <div className="demo-canvas">
                         <iframe
                             key={scene}
-                            src={`/prototypes/v1/index.html?${query.toString()}`}
+                            src={`/prototypes/extension/v1.html?${query.toString()}`}
                             title="Interactive VidQuery extension prototype"
                             loading="eager"
                         />

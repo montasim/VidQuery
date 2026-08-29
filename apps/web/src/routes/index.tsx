@@ -88,29 +88,26 @@ function Home() {
                             <div className="mb-7 flex items-center gap-3 text-signal">
                                 <ContextWave />
                                 <span className="h-px w-10 bg-signal/35" />
-                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.18em]">
+                                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em]">
                                     Context ready
                                 </span>
                             </div>
 
-                            <h1 className="display-tight max-w-[640px] text-[3.25rem] font-black leading-[0.9] sm:text-[clamp(4.2rem,5.8vw,6rem)]">
+                            <h1 className="display-tight hero-title">
                                 The answer is already in the video.
                                 <span className="mt-3 block text-signal">
                                     Ask for it.
                                 </span>
                             </h1>
 
-                            <p className="mt-8 max-w-[590px] text-lg leading-8 text-steel sm:text-xl">
+                            <p className="hero-copy mt-7">
                                 VidQuery reads the description, transcript,
                                 comments, and replies beside YouTube, then
                                 grounds Gemini answers in that context.
                             </p>
 
                             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                                <Button
-                                    asChild
-                                    className="h-12 rounded-xl bg-signal px-5 font-extrabold !text-white hover:-translate-y-0.5 hover:bg-signal-dark"
-                                >
+                                <Button asChild className="download-button">
                                     <a href={downloadUrl}>
                                         Download for Chrome{' '}
                                         <DownloadIcon data-icon="inline-end" />
@@ -119,13 +116,13 @@ function Home() {
                                 <Button
                                     asChild
                                     variant="outline"
-                                    className="h-12 rounded-xl border-hairline bg-white px-5 font-extrabold hover:-translate-y-0.5 hover:bg-cloud"
+                                    className="h-[46px] rounded-2xl border-hairline bg-white px-5 text-sm font-bold hover:-translate-y-px hover:bg-cloud"
                                 >
                                     <a href="#demo">See it beside YouTube</a>
                                 </Button>
                             </div>
 
-                            <p className="mt-5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-steel">
+                            <p className="mt-5 font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-steel">
                                 Chrome 141+ · Gemini API key required · No
                                 account
                             </p>
@@ -144,7 +141,7 @@ function Home() {
                         ].map((statement) => (
                             <p
                                 key={statement}
-                                className="font-mono text-[10px] font-bold uppercase tracking-[0.13em] text-steel"
+                                className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-steel"
                             >
                                 <CheckIcon className="mr-2 inline size-3 text-signal" />
                                 {statement}
@@ -178,10 +175,10 @@ function Home() {
                                             className="source-node"
                                         >
                                             <Icon className="mb-3 size-5 text-signal md:hidden" />
-                                            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-steel">
+                                            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-steel">
                                                 {label}
                                             </p>
-                                            <h3 className="mt-2 text-xl font-extrabold">
+                                            <h3 className="mt-2 text-lg font-bold leading-7">
                                                 {title}
                                             </h3>
                                             <p className="mt-2 text-sm leading-6 text-steel">
@@ -197,7 +194,7 @@ function Home() {
                                     <div className="flex min-w-0 items-center gap-3">
                                         <BrandMark className="size-10 shrink-0" />
                                         <div className="min-w-0">
-                                            <p className="text-sm font-extrabold">
+                                            <p className="text-sm font-bold">
                                                 Ask this video
                                             </p>
                                             <p className="mt-0.5 truncate text-xs text-white/50">
@@ -216,7 +213,7 @@ function Home() {
                                         <span className="absolute inset-y-0 left-0 w-[7%] bg-signal" />
                                         <span className="absolute left-[7%] top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal" />
                                     </span>
-                                    <span className="font-mono text-[9px] font-bold uppercase tracking-[0.12em]">
+                                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]">
                                         Comments found
                                     </span>
                                 </div>
@@ -251,12 +248,12 @@ function Home() {
                                 <p className="eyebrow text-signal">
                                     Privacy by architecture
                                 </p>
-                                <h2 className="display-tight mt-5 max-w-3xl text-4xl font-black leading-[0.95] sm:text-6xl">
+                                <h2 className="section-title max-w-3xl">
                                     Your question takes the shortest possible
                                     route.
                                 </h2>
                             </div>
-                            <div className="self-end text-lg leading-8 text-white/60">
+                            <div className="self-end max-w-[62ch] text-base leading-7 text-white/70">
                                 <p>
                                     VidQuery does not operate a relay server.
                                     Your chosen video context moves from the
@@ -264,7 +261,7 @@ function Home() {
                                 </p>
                                 <a
                                     href="https://github.com/montasim/VidQuery"
-                                    className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:text-signal"
+                                    className="mt-7 inline-flex items-center gap-2 font-semibold text-white hover:text-signal"
                                 >
                                     Inspect the source{' '}
                                     <ArrowRightIcon className="size-4" />
@@ -275,7 +272,7 @@ function Home() {
                         <div className="mt-16 grid border-y border-white/15 md:grid-cols-2">
                             <div className="border-b border-white/15 py-8 md:border-r md:border-b-0 md:pr-10">
                                 <ShieldCheckIcon className="size-7 text-signal" />
-                                <h3 className="mt-5 text-xl font-extrabold">
+                                <h3 className="mt-5 text-lg font-bold">
                                     No VidQuery account
                                 </h3>
                                 <p className="mt-3 max-w-md leading-7 text-white/55">
@@ -295,7 +292,7 @@ function Home() {
                                 >
                                     <path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v10H5z" />
                                 </svg>
-                                <h3 className="mt-5 text-xl font-extrabold">
+                                <h3 className="mt-5 text-lg font-bold">
                                     Encrypted key storage
                                 </h3>
                                 <p className="mt-3 max-w-md leading-7 text-white/55">
@@ -324,7 +321,7 @@ function Home() {
                                 </p>
                                 <Button
                                     asChild
-                                    className="mt-8 h-12 rounded-xl bg-signal px-5 font-extrabold !text-white hover:bg-signal-dark"
+                                    className="download-button mt-8"
                                 >
                                     <a href={downloadUrl}>
                                         Get the latest release{' '}
@@ -351,11 +348,11 @@ function Home() {
                                         key={title}
                                         className="grid gap-4 border-b border-hairline py-7 sm:grid-cols-[72px_1fr]"
                                     >
-                                        <span className="font-mono text-xs font-bold text-signal">
+                                        <span className="font-mono text-xs font-semibold text-signal">
                                             0{index + 1}
                                         </span>
                                         <div>
-                                            <h3 className="text-xl font-extrabold">
+                                            <h3 className="text-lg font-bold leading-7">
                                                 {title}
                                             </h3>
                                             <p className="mt-2 leading-7 text-steel">
@@ -388,7 +385,7 @@ function Home() {
                                     value={item.question}
                                     className="border-hairline"
                                 >
-                                    <AccordionTrigger className="rounded-none py-6 text-base font-extrabold hover:no-underline">
+                                    <AccordionTrigger className="rounded-none py-6 text-base font-bold hover:no-underline">
                                         {item.question}
                                     </AccordionTrigger>
                                     <AccordionContent className="max-w-2xl pb-6 leading-7 text-steel">
@@ -400,19 +397,19 @@ function Home() {
                     </div>
                 </section>
 
-                <section className="bg-signal px-5 py-20 text-white sm:px-8 lg:px-12">
+                <section className="bg-[#eef1f2] px-5 py-20 text-ink sm:px-8 lg:px-12">
                     <div className="mx-auto flex max-w-[1240px] flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                         <div>
-                            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-white/65">
+                            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-steel">
                                 Context ready
                             </p>
-                            <h2 className="display-tight mt-4 max-w-4xl text-4xl font-black leading-[0.95] sm:text-6xl">
+                            <h2 className="section-title !mt-4 max-w-4xl">
                                 Stop hunting through the page. Ask the video.
                             </h2>
                         </div>
                         <Button
                             asChild
-                            className="h-12 shrink-0 rounded-xl bg-white px-5 font-extrabold !text-signal hover:bg-ink hover:!text-white"
+                            className="h-[46px] shrink-0 rounded-2xl bg-ink px-5 text-sm font-bold !text-white hover:bg-[#111315]"
                         >
                             <a href={downloadUrl}>Download for Chrome</a>
                         </Button>
@@ -422,15 +419,15 @@ function Home() {
 
             <footer className="bg-ink px-5 py-8 text-white sm:px-8 lg:px-12">
                 <div className="mx-auto flex max-w-[1240px] flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-2.5 font-display font-extrabold">
+                    <div className="flex items-center gap-2.5 font-display font-bold">
                         <BrandMark className="size-7" /> VidQuery
                     </div>
-                    <p className="text-white/45">
+                    <p className="text-white/65">
                         A private-by-default Gemini companion for YouTube.
                     </p>
                     <a
                         href="https://github.com/montasim/VidQuery"
-                        className="inline-flex items-center gap-2 font-bold hover:text-signal"
+                        className="inline-flex items-center gap-2 font-semibold hover:text-signal"
                     >
                         <Code2Icon className="size-4" /> GitHub
                     </a>
