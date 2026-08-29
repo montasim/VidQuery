@@ -9,7 +9,7 @@ VidQuery is a Chromium extension for people who want to question a video without
 
 The V2 extension uses a Chrome Side Panel for conversations and a compact toolbar popup for consent and Gemini connection setup. It has no intermediary backend, account, analytics service, or persistent conversation archive.
 
-**[Browse releases](https://github.com/montasim/VidQuery/releases) · [Preview the approved interface](prototypes/v1/index.html) · [Report an issue](https://github.com/montasim/VidQuery/issues)**
+**[Browse releases](https://github.com/montasim/VidQuery/releases) · [Preview the approved interface](prototypes/extension/v1.html) · [Report an issue](https://github.com/montasim/VidQuery/issues)**
 
 ## What it does
 
@@ -151,8 +151,8 @@ WXT prints the development output path. Load that unpacked directory in Chrome, 
 apps/extension/          WXT extension source, tests, and package configuration
 apps/web/                TanStack Start, shadcn, Tailwind, and Netlify website
 assets/brand/            Canonical VidQuery brand assets
-prototypes/v1/           Standalone approved extension interface reference
-prototypes/landing/      Original static landing-page reference
+prototypes/extension/v1.html Standalone approved extension interface reference
+prototypes/web/v1.html       Original static landing-page reference
 docs/adr/                Accepted architecture decisions
 ```
 

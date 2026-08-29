@@ -206,9 +206,9 @@
                         >GitHub ↗</a
                     >
                     <a
-                        href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                        href="https://github.com/montasim/VidQuery/releases/latest/download/VidQuery-chrome-unpacked.zip"
                         class="rounded-xl bg-ink px-4 py-2.5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#303238]"
-                        >Download v2.0.0</a
+                        >Download latest</a
                     >
                 </div>
 
@@ -305,7 +305,7 @@
 
                         <div class="mt-9 flex flex-col gap-3 sm:flex-row">
                             <a
-                                href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                                href="https://github.com/montasim/VidQuery/releases/latest/download/VidQuery-chrome-unpacked.zip"
                                 class="inline-flex min-h-12 items-center justify-center rounded-xl bg-signal px-5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-signalDark"
                                 >Download for Chrome
                                 <span class="ml-2" aria-hidden="true"
@@ -379,7 +379,7 @@
                                 <div id="demo-canvas" class="demo-canvas">
                                     <iframe
                                         id="product-demo"
-                                        src="../v1/index.html?embed=1&scene=chat&state=ready"
+                                        src="../extension/v1.html?embed=1&scene=chat&state=ready"
                                         title="Interactive VidQuery extension prototype"
                                         loading="eager"
                                     ></iframe>
@@ -675,12 +675,12 @@
                                 Store.
                             </p>
                             <a
-                                href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                                href="https://github.com/montasim/VidQuery/releases/latest/download/VidQuery-chrome-unpacked.zip"
                                 class="mt-8 inline-flex min-h-12 items-center rounded-xl bg-signal px-5 text-sm font-extrabold text-white transition hover:-translate-y-0.5 hover:bg-signalDark"
-                                >Download v2.0.0 <span class="ml-2">↓</span></a
+                                >Download latest <span class="ml-2">↓</span></a
                             >
                             <a
-                                href="https://github.com/montasim/VidQuery/releases/tag/v2.0.0"
+                                href="https://github.com/montasim/VidQuery/releases/latest"
                                 class="mt-4 block text-sm font-bold text-steel underline decoration-hairline underline-offset-4 hover:text-ink"
                                 >View release and checksum ↗</a
                             >
@@ -861,7 +861,7 @@
                         </h2>
                     </div>
                     <a
-                        href="https://github.com/montasim/VidQuery/releases/download/v2.0.0/VidQuery-v2.0.0-chrome-unpacked.zip"
+                        href="https://github.com/montasim/VidQuery/releases/latest/download/VidQuery-chrome-unpacked.zip"
                         class="inline-flex min-h-12 shrink-0 items-center rounded-xl bg-white px-5 text-sm font-extrabold text-signal transition hover:-translate-y-0.5 hover:bg-[#f5f6f7]"
                         >Download VidQuery <span class="ml-2">↓</span></a
                     >
@@ -969,7 +969,7 @@
             demoTabs.forEach((tab) => {
                 tab.addEventListener('click', () => {
                     const scene = tab.dataset.scene;
-                    demoFrame.src = `../v1/index.html?embed=1&scene=${scene}${scene === 'chat' ? '&state=ready' : ''}`;
+                    demoFrame.src = `../extension/v1.html?embed=1&scene=${scene}${scene === 'chat' ? '&state=ready' : ''}`;
                     demoTabs.forEach((candidate) => {
                         const active = candidate === tab;
                         candidate.classList.toggle('bg-ink', active);

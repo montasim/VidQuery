@@ -4,16 +4,16 @@ This folder is a standalone visual prototype for the extension’s V2 interface.
 
 ## Preview
 
-Open `index.html` in a browser. Tailwind CSS and the typefaces load from CDNs, so an internet connection is required for the intended styling.
+Open `v1.html` in a browser. Tailwind CSS and the typefaces load from CDNs, so an internet connection is required for the intended styling.
 
 Useful direct states:
 
-- `index.html?scene=chat`
-- `index.html?scene=chat&state=loading`
-- `index.html?scene=chat&state=error`
-- `index.html?scene=history`
-- `index.html?scene=empty`
-- `index.html?scene=settings`
+- `v1.html?scene=chat`
+- `v1.html?scene=chat&state=loading`
+- `v1.html?scene=chat&state=error`
+- `v1.html?scene=history`
+- `v1.html?scene=empty`
+- `v1.html?scene=settings`
 
 The prototype toolbar can also switch between every state without reloading.
 
